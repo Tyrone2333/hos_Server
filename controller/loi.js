@@ -115,11 +115,11 @@ export default class Loi {
 
         let salt = getSha1("fucksalt" + username)
         let password = getSha1(username + pwd + salt)
-        let user ={
+        let user = {
             username,
-            pwd : password,
+            pwd: password,
             salt,
-            register_time : Math.round(new Date().getTime() / 1000)
+            register_time: Math.round(new Date().getTime() / 1000)
         }
         let sql = "insert into loi_user set ?"
         let result = await query(sql, user).catch((err) => {
@@ -145,9 +145,9 @@ export default class Loi {
     static async auth(req, res, next) {
         const jwt = require('jsonwebtoken');
 
-        let headerToken = req.headers["auth-token"]
+        let headerToken = req.headers["token"]
         let data = req.body
-        const secretOrPrivateKey = "enzo server"; // 这是加密的key（密钥）
+        let secretOrPrivateKey = "enzo server"; // 这是加密的key（密钥）
         let token = jwt.sign(data, secretOrPrivateKey, {expiresIn: 60 * 60});
 
         let decode, error
@@ -158,7 +158,7 @@ export default class Loi {
             decode = decoded
         });
 
-        if (error.message === "jwt expired") {
+        if (error !== undefined &&  error.message=== "jwt expired") {
             res.send({
                 errno: 1,
                 token,
@@ -167,12 +167,62 @@ export default class Loi {
                 error,
                 message: "验证过期，请重新登录"
             })
-        } else {
+        } else if(headerToken === undefined || error) {
             res.send({
-                errno: 0,
-                token,
-                decode,
-                error
+                errno: -1,
+                error,
+                message: "无权访问,请重新登录"
+            })
+        } else {
+            next()
+        }
+    }
+
+    static async login(req, res, next) {
+        const jwt = require('jsonwebtoken');
+
+        let {username, pwd} = req.body
+        let secretOrPrivateKey = "enzo server"; // 这是加密的key（密钥）
+
+        let selectSql = "SELECT * FROM loi_user WHERE loi_user.username=?"
+        const row = await query(selectSql, username).catch((err) => {
+            console.log(err)
+            return err.message
+        })
+
+        if(row.length > 0){
+            let expectPwd = getSha1(username + pwd + row[0].salt)
+            // 登录成功
+            if(row[0].username === username && expectPwd === row[0].pwd){
+                let user = {}
+                for(let key in row[0]){
+                    user[key] = row[0][key]
+                }
+                delete user.salt
+                delete user.pwd
+                let data = {
+                    username,
+                    salt: row[0].salt
+                }
+                let token = jwt.sign(data, secretOrPrivateKey, {expiresIn: 60 * 60})
+                res.send({
+                    errno: 0,
+                    token,
+                    user,
+                    message: "登录成功"
+                })
+            }else{
+                res.send({
+                    errno: 1,
+                    message: "密码错误"
+                })
+            }
+
+        }else {
+            res.send({
+                errno: -1,
+                row: row,
+                message: "用户不存在"
             })
         }
     }

@@ -33,6 +33,16 @@ export default class Loi {
         return returnRes(row)
     }
 
+    static async getByInventoryId(id) {
+
+        let sql = 'select * from inventory where id=?'
+        const row = await query(sql, [id]).catch((err) => {
+            console.log(err)
+        })
+
+        return returnRes(row)
+    }
+
     static async getByInventoryName(name) {
 
         log(name)
@@ -46,6 +56,8 @@ export default class Loi {
 
     static async entry(req, res, next) {
         let inventory = req.body
+        inventory.create_time = Math.round(new Date().getTime() / 1000)
+        inventory.update_time = Math.round(new Date().getTime() / 1000)
 
         let sql = "insert into inventory set ?"
 
@@ -56,7 +68,7 @@ export default class Loi {
         if (result !== undefined && result.affectedRows === 1) {
             res.send({
                 errno: 0,
-                id : result.insertId,
+                id: result.insertId,
                 message: '添加库存信息成功',
             })
         } else {
@@ -69,6 +81,111 @@ export default class Loi {
 
     }
 
+    static async modify(req, res, next) {
+        let inventory = req.body
+        let id = inventory.id
+        delete inventory.id
+        delete inventory.create_time
+        inventory.update_time = Math.round(new Date().getTime() / 1000)
+
+
+        let sql = 'update inventory set ? where id=? '
+        let result = await query(sql, [inventory, id]).catch((err) => {
+            console.log(err)
+            return err.sqlMessage
+        })
+        if (result !== undefined && result.affectedRows === 1) {
+            res.send({
+                errno: 0,
+                id: result.insertId,
+                message: '修改库存信息成功',
+            })
+        } else {
+            res.send({
+                errno: -1,
+                message: result,
+            })
+
+        }
+
+    }
+
+    static async register(req, res, next) {
+        let {username, pwd} = req.body
+
+        let salt = getSha1("fucksalt" + username)
+        let password = getSha1(username + pwd + salt)
+        let user ={
+            username,
+            pwd : password,
+            salt,
+            register_time : Math.round(new Date().getTime() / 1000)
+        }
+        let sql = "insert into loi_user set ?"
+        let result = await query(sql, user).catch((err) => {
+            console.log(err)
+            return err.sqlMessage
+        })
+        if (result !== undefined && result.affectedRows === 1) {
+            res.send({
+                errno: 0,
+                id: result.insertId,
+                message: '注册成功',
+            })
+        } else {
+            res.send({
+                errno: -1,
+                message: result,
+            })
+
+        }
+
+    }
+
+    static async auth(req, res, next) {
+        const jwt = require('jsonwebtoken');
+
+        let headerToken = req.headers["auth-token"]
+        let data = req.body
+        const secretOrPrivateKey = "enzo server"; // 这是加密的key（密钥）
+        let token = jwt.sign(data, secretOrPrivateKey, {expiresIn: 60 * 60});
+
+        let decode, error
+        jwt.verify(headerToken, secretOrPrivateKey, function (err, decoded) {
+            if (err) {
+                error = err
+            }
+            decode = decoded
+        });
+
+        if (error.message === "jwt expired") {
+            res.send({
+                errno: 1,
+                token,
+                temp: getSha1("enzo"),
+                decode,
+                error,
+                message: "验证过期，请重新登录"
+            })
+        } else {
+            res.send({
+                errno: 0,
+                token,
+                decode,
+                error
+            })
+        }
+    }
+
+
+}
+
+function getSha1(str) {
+    var crypto = require('crypto');
+    var sha1 = crypto.createHash("sha1");//定义加密方式:md5不可逆,此处的md5可以换成任意hash加密的方法名称；
+    sha1.update(str);
+    var res = sha1.digest("hex");  //加密后的值d
+    return res;
 }
 
 function returnRes(row) {

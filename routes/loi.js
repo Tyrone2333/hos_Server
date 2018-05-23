@@ -18,8 +18,16 @@ router.get('/inventory/name/:inventoryName', async (req, res) => {
     const result = await Loi.getByInventoryName(inventoryName)
     res.json(result)
 })
+router.get('/inventory/id/:id', async (req, res) => {
+    const {id} = req.params;
+    const result = await Loi.getByInventoryId(id)
+    res.json(result)
+})
 
 router.post('/entry', Loi.entry)
+router.post('/modify', Loi.modify)
+router.post('/auth', Loi.auth)
+router.post('/register', Loi.register)
 
 module.exports = router;
 // export default  router;

@@ -1,1 +1,1 @@
-pm2 monit
+pm2 logs

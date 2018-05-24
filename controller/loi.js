@@ -7,8 +7,14 @@ export default class Loi {
 
     //获取用户信息
     static async getAllInoventory(req, res, next) {
+        log(req.query)
+        let page = req.query.page || 1 //设置当前页数，没有则设置为1
+        let num = 10;//每页显示10条数据
+        // 获取limit的第一个参数的值 offset ，(传入的页数-1) * 每页的数据 得到limit第一个参数的值
+        let offset = (page - 1) * num;
+
         try {
-            let sql = 'select * from inventory'
+            let sql = 'select * from inventory order by id desc limit '+offset+','+num
             const row = await query(sql).catch((err) => {
                 console.log(err)
             })
@@ -24,7 +30,6 @@ export default class Loi {
     }
 
     static async getByInventoryCode(code) {
-
         let sql = 'select * from inventory where i_code=?'
         const row = await query(sql, [code]).catch((err) => {
             console.log(err)
@@ -43,15 +48,29 @@ export default class Loi {
         return returnRes(row)
     }
 
-    static async getByInventoryName(name) {
+    static async getByInventoryName(req, res, next){
 
-        log(name)
-        let sql = 'select * from inventory where i_name like ?'
-        const row = await query(sql, '%' + name + '%').catch((err) => {
-            console.log(err)
-        })
+        let name = req.params.inventoryName
+        let page = req.query.page || 1 //设置当前页数，没有则设置为1
+        let num = 10;//每页显示10条数据
+        // 获取limit的第一个参数的值 offset ，(传入的页数-1) * 每页的数据 得到limit第一个参数的值
+        let offset = (page - 1) * num;
 
-        return returnRes(row)
+        try {
+            let sql = 'select * from inventory where i_name like ? or i_specification like ? order by id desc limit '+offset+','+num
+
+            const row = await query(sql, ['%' + name + '%', '%' + name + '%']).catch((err) => {
+                console.log(err)
+            })
+            res.send(returnRes(row))
+
+        } catch (err) {
+            console.log(err);
+            res.send({
+                errno: -1,
+                message: '出错了！'
+            })
+        }
     }
 
     static async entry(req, res, next) {
@@ -158,7 +177,7 @@ export default class Loi {
             decode = decoded
         });
 
-        if (error !== undefined &&  error.message=== "jwt expired") {
+        if (error !== undefined && error.message === "jwt expired") {
             res.send({
                 errno: 1,
                 token,
@@ -167,7 +186,7 @@ export default class Loi {
                 error,
                 message: "验证过期，请重新登录"
             })
-        } else if(headerToken === undefined || error) {
+        } else if (headerToken === undefined || error) {
             res.send({
                 errno: -1,
                 error,
@@ -190,12 +209,12 @@ export default class Loi {
             return err.message
         })
 
-        if(row.length > 0){
+        if (row.length > 0) {
             let expectPwd = getSha1(username + pwd + row[0].salt)
             // 登录成功
-            if(row[0].username === username && expectPwd === row[0].pwd){
+            if (row[0].username === username && expectPwd === row[0].pwd) {
                 let user = {}
-                for(let key in row[0]){
+                for (let key in row[0]) {
                     user[key] = row[0][key]
                 }
                 delete user.salt
@@ -204,25 +223,51 @@ export default class Loi {
                     username,
                     salt: row[0].salt
                 }
-                let token = jwt.sign(data, secretOrPrivateKey, {expiresIn: 60 * 60})
+                let token = jwt.sign(data, secretOrPrivateKey, {expiresIn: 60 * 60 * 24})
                 res.send({
                     errno: 0,
                     token,
                     user,
                     message: "登录成功"
                 })
-            }else{
+            } else {
                 res.send({
                     errno: 1,
                     message: "密码错误"
                 })
             }
 
-        }else {
+        } else {
             res.send({
                 errno: -1,
                 row: row,
                 message: "用户不存在"
+            })
+        }
+    }
+
+    static async delete(req, res, next) {
+        let inventory = req.body
+        let id = inventory.id
+
+        let sql = "DELETE FROM inventory WHERE id=?"
+        const row = await query(sql, id).catch((err) => {
+            console.log(err)
+            return err.message
+        })
+
+        log(row)
+        if (row !== undefined && row.affectedRows === 1) {
+            // 删除成功
+            res.send({
+                errno: 0,
+                message: "删除成功"
+            })
+        } else {
+            res.send({
+                errno: -1,
+                row: row,
+                message: "失败,请刷新重试"
             })
         }
     }
@@ -246,9 +291,9 @@ function returnRes(row) {
         })
     } else {
         return ({
-            errno: -1,
+            errno: 2,
             data: row[0],
-            message: "查询为空"
+            message: "查询为空",
         })
     }
 }

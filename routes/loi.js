@@ -9,7 +9,6 @@ import Loi from "../controller/loi"
 // },Loi.auth, Loi.getAllInoventory);
 
 
-
 router.post('/auth', Loi.auth)
 
 

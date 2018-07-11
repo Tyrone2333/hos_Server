@@ -9,10 +9,12 @@ import router from "./routes/index"
 
 // 设置为全局数据库连接句柄
 import query from './common/db'
+
 global.query = query
 // 全局公共函数
 import * as func from "./common/func"
-for(let i in func){
+
+for (let i in func) {
     global[i] = func[i]
 }
 
@@ -35,30 +37,48 @@ app.set('view engine', 'jade');
 
 app.use(logger('dev'));
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use("/static", express.static(path.join(__dirname, 'public')));
 
 
-// app.use('/', indexRouter);
-// app.use('/user', userRouter);
 router(app)
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  next(createError(404));
+// app.use(function(req, res, next) {
+//   next(createError(404));
+// });
+app.use(function (req, res, next) {
+    res.state(404)
+    // res.status(404)
+    res.send({
+        errno: 4,
+        message: '404 没有找到页面',
+    })
 });
+
 
 // error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+app.use(function (err, req, res, next) {
+    // set locals, only providing error in development
+    res.locals.message = err.message;
+    res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
+    // render the error page
+    res.status(err.status || 500);
+
+    console.warn(err)
+    // respond with json
+    if (req.accepts('json')) {
+        res.send({
+            errno: 5,
+            message: '500 服务器出错',
+            errdetial:err.message
+        })
+    } else {
+        // respond with html page
+        res.render('error');
+    }
 });
-
 
 
 module.exports = app;

@@ -5,7 +5,7 @@
 class Auth {
     constructor() {
         this.secretOrPrivateKey = "enzo server secret key"  // 这是加密的密钥
-        this.expiresTime = 60*60*24
+        this.expiresTime = 60 * 60 * 24
 
         // 有(req, res, next)的函数里不这样绑定是访问不到this,
         this.checkUser = this.checkUser.bind(this);
@@ -63,6 +63,12 @@ class Auth {
         } else {
             next()
         }
+    }
+
+    async test(req, res, next) {
+        res.send({
+            test: "test"
+        })
     }
 
 }

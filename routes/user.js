@@ -7,7 +7,7 @@ import Auth from "../middlewares/auth"
 import User from "../controller/user"
 
 // 测试用
-router.post('/test/:id',Auth.checkUser)
+router.post('/test/:id',Auth.checkUser,Auth.test)
 
 // 登录注册
 router.post('/register', User.register)

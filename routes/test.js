@@ -2,41 +2,43 @@ var express = require('express');
 var router = express.Router();
 var rf = require("fs");
 
-router.get('/', function (req, res, next) {
-    const promise = new Promise(function(resolve, reject) {
-        return reject(new Error('test'));
-    });
-    promise.catch(function(error) {
-        log(1)
-    });
+router.get('/', async (req, res, next) => {
+    let data = await read().then((data) =>{
+        log("先then一下")
+        return data
+    })
+    res.send({
+        status: 200,
+        // watch:"in watch???",
+        data
+    })
+    log("hos_api test ")
+});
+router.post('/', async (req, res, next) => {
+    let data = await read()
+    log(data)
+    res.send({
+        status: 200,
+        data
+    })
+    log(3)
+});
 
-    new Promise((resolve, reject) => {
-        return resolve(22);
-        // 后面的语句不会执行
-        console.log(2);
-    }).then(function (val) {
-        log(val)
-        rf.readFile("routes/tiest.txt", 'utf-8', function (err, data) {
+
+async function read() {
+    return new Promise((resolve, reject) => {
+        rf.readFile(__dirname + "/test.txt", 'utf-8', (err, data) => {
             if (err) {
-                res.send({
-                    status: -1,
-                    errno: err.errno
-                })
+                reject(err)
             } else {
-                res.send({
-                    status: 200,
-                    msg: "test page",
-                    data: data
-                })
+                // log(data)
+                resolve(data)
             }
         });
     }).catch(err => {
         log(err)
     })
-
-    log(3)
-});
-
+}
 
 module.exports = router;
 // export default  router;

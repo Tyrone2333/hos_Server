@@ -1,0 +1,15 @@
+{
+  "apps": [
+    {
+      "name": "mywork",
+      "script"      	   : "./bin/dev-server.js",
+      "merge_logs"  	   : true,
+      "log_date_format"  : "YYYY-MM-DD HH:mm Z",
+      "watch": true,
+      "max_restarts"     : 15,
+      "max_memory_restart": "1000M",
+      "exec_mode"        : "fork",
+      "autorestart"      : true
+    }
+  ]
+}

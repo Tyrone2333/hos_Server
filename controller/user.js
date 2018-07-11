@@ -1,31 +1,9 @@
+import Auth from "../middlewares/auth"
 
-function returnRes(row) {
-    if (row.length > 0) {
-        return ({
-            errno: 0,
-            data: row
-        })
-    } else {
-        return ({
-            errno: 2,
-            data: row[0],
-            message: "查询为空",
-        })
-    }
-}
-function getSha1(str) {
-    var crypto = require('crypto');
-    var sha1 = crypto.createHash("sha1");//定义加密方式:md5不可逆,此处的md5可以换成任意hash加密的方法名称；
-    sha1.update(str);
-    var res = sha1.digest("hex");  //加密后的值d
-    return res;
-}
 
 export default class User {
     constructor() {
-        // this.name = info.name;
-        // this.age = info.age;
-        // this.location = info.location
+
     }
 
     static async register(req, res, next) {
@@ -39,7 +17,7 @@ export default class User {
             salt,
             register_time: Math.round(new Date().getTime() / 1000)
         }
-        let sql = "insert into loi_user set ?"
+        let sql = "insert into hos_user set ?"
         let result = await query(sql, user).catch((err) => {
             console.log(err)
             return err.sqlMessage
@@ -61,12 +39,9 @@ export default class User {
     }
 
     static async login(req, res, next) {
-        const jwt = require('jsonwebtoken');
-
         let {username, pwd} = req.body
-        let secretOrPrivateKey = "enzo server"; // 这是加密的key（密钥）
 
-        let selectSql = "SELECT * FROM loi_user WHERE loi_user.username=?"
+        let selectSql = "SELECT * FROM hos_user WHERE username=?"
         const row = await query(selectSql, username).catch((err) => {
             console.log(err)
             return err.message
@@ -82,15 +57,13 @@ export default class User {
                 }
                 delete user.salt
                 delete user.pwd
-                let data = {
-                    username,
-                    salt: row[0].salt
-                }
-                let token = jwt.sign(data, secretOrPrivateKey, {expiresIn: 60 * 60 * 24})
+
+                let token = await Auth.getToken(username)
+
                 res.send({
                     errno: 0,
                     token,
-                    user,
+                    userinfo:user,
                     message: "登录成功"
                 })
             } else {
@@ -109,17 +82,21 @@ export default class User {
         }
     }
 
-    static async getUser(userId) {
+    static async getUserInfo(req, res, next) {
 
-        let sql = 'select * from loi_user where id=?'
+        let userId = req.params.id
+
+        log(userId)
+        let sql = 'select * from hos_user where id=?'
         const row = await query(sql, [userId]).catch((err) => {
             console.log(err)
         })
-        return returnRes(row)
+        res.send(returnRes(row))
     }
 
 
 }
 
 // module.exports = new User(user_info);
+
 

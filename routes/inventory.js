@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 
 import Inventory from "../controller/inventory"
-import Loi from "../controller/loi"
+import Loi from "../controller/hos"
 
 
 router.get('/code/:inventoryCode', Loi.auth, Inventory.getByInventoryCode)

@@ -6,12 +6,16 @@ var logger = require('morgan');
 
 
 import router from "./routes/index"
-import {log} from "./common/func"
-import query from './common/db' //数据库连接句柄
-// 全局公共函数
-global.log = log
+
 // 设置为全局数据库连接句柄
+import query from './common/db'
 global.query = query
+// 全局公共函数
+import * as func from "./common/func"
+for(let i in func){
+    global[i] = func[i]
+}
+
 var app = express();
 app.all('*', (req, res, next) => {
     res.header("Access-Control-Allow-Origin", req.headers.origin || '*');

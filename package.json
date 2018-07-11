@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "node ./bin/dev-server.js",
     "chromeDev": "node --inspect ./bin/dev-server.js",
-    "pm2": "pm2 start  ./bin/dev-server.js  --watch "
+    "pm2sc": "pm2 start monit.json &&  pm2 logs "
   },
   "dependencies": {
     "cookie-parser": "~1.4.3",

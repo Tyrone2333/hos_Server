@@ -1,4 +1,4 @@
-export default class Loi {
+export default class Hos {
     constructor() {
         // this.name = info.name;
         // this.age = info.age;

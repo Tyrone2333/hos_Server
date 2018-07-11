@@ -1,8 +1,8 @@
 
 var user = require("./user")
 var test = require("./test")
-var loi = require("./loi")
-var inventory = require("./inventory")
+var hos = require("./hos")
+
 var router = require('express').Router();
 
 router.get('/', function (req, res, next) {
@@ -13,11 +13,11 @@ router.get('/', function (req, res, next) {
 
     })
 })
+
 export default (app) => {
-    app.use("/", router)
-    app.use("/test", test)
-    app.use("/loi/user", user)
-    app.use("/loi/inventory", inventory)
-    app.use("/loi", loi)
+    app.use("/hos_api/", router)
+    app.use("/hos_api/test", test)
+    app.use("/hos_api/user", user)
+    app.use("/hos_api/loi", hos)
 }
 

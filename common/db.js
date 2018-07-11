@@ -6,14 +6,14 @@ if(process.env.NODE_ENV === "production"){
     host: '176.122.171.36',
     user: 'root',
     password: 'wcnmbgpz',
-    database: 'loi'
+    database: 'bdm289907541_db'
 })
 }else {
      pool = mysql.createPool({
         host: '127.0.0.1',
         user: 'root',
         password: 'wcnmbgpz',
-        database: 'loi'
+        database: 'bdm289907541_db'
     })
 }
 

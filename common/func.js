@@ -25,7 +25,7 @@ var styles = {
     'yellowBG'      : ['\x1B[43m', '\x1B[49m']
 };
 
-function log(info) {
+export function log(info) {
     if (typeof info === "string"  ) {
         console.log('\x1B[35m%s', info,)
 
@@ -37,4 +37,27 @@ function log(info) {
     }
 }
 
-export {log}
+export function returnRes(row) {
+    if (row.length > 0) {
+        return ({
+            errno: 0,
+            data: row
+        })
+    } else {
+        return ({
+            errno: 2,
+            data: row[0],
+            message: "查询为空",
+        })
+    }
+}
+
+export function getSha1(str) {
+    var crypto = require('crypto');
+    var sha1 = crypto.createHash("sha1");//定义加密方式:md5不可逆,此处的md5可以换成任意hash加密的方法名称；
+    sha1.update(str);
+    var res = sha1.digest("hex");  //加密后的值d
+    return res;
+}
+
+// export {log,returnRes,getSha1}

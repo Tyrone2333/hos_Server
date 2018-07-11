@@ -12,7 +12,9 @@ export default class Inventory {
         let offset = (page - 1) * num;
 
         try {
-            let sql = 'select * from inventory order by id desc limit ' + offset + ',' + num
+            let sql = 'select * from inventory order by id desc limit '
+                + offset + ','
+                + num
             const row = await query(sql).catch((err) => {
                 console.log(err)
             })

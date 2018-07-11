@@ -9,9 +9,9 @@ module.exports = {
     env: {
         // NODE_ENV: '"production"',
         NODE_ENV: '"development"',
-        BASE_API: '"http://192.168.1.186:3000"',
+        BASE_API: '"http://192.168.1.186:10010"',
     },
-    port: 3000,
+    port: 10010,
     autoOpenBrowser: false,
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',

@@ -1,9 +1,10 @@
 
-var user = require("./user")
-var test = require("./test")
-var hos = require("./hos")
+let user = require("./user")
+let test = require("./test")
+let article = require("./article")
+let collection = require("./collection")
 
-var router = require('express').Router();
+let router = require('express').Router();
 
 router.get('/', function (req, res, next) {
     // console.log( process.env.PORT)
@@ -18,6 +19,7 @@ export default (app) => {
     app.use("/hos_api/", router)
     app.use("/hos_api/test", test)
     app.use("/hos_api/user", user)
-    app.use("/hos_api/loi", hos)
+    app.use("/hos_api/article", article)
+    app.use("/hos_api/collection", collection)
 }
 

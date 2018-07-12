@@ -6,8 +6,8 @@ import Auth from "../middlewares/auth"
 
 import Article from "../controller/article"
 
-// 获取用户信息
-router.get('/:id', Article.getArticle)
-
+// 获取所有文章
+router.get('/', Article.getArticleList)
+router.get('/:id', Article.getArticleById)
 
 module.exports = router;

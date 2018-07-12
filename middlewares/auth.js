@@ -37,7 +37,8 @@ class Auth {
     // 验证用户是否登录
     async checkUser(req, res, next) {
         const jwt = require('jsonwebtoken');
-        let headerToken = req.headers["token"]
+        let headerToken = req.headers["token"] || req.body.token
+        let expectUsername = req.body.username
         let decode, error
 
         jwt.verify(headerToken, this.secretOrPrivateKey, function (err, decoded) {
@@ -54,6 +55,12 @@ class Auth {
                 error,
                 message: "验证过期，请重新登录"
             })
+        }else if (error !== undefined && error.message === "jwt must be provided") {
+            res.send({
+                errno: -1,
+                error,
+                message: "没有token信息,请登录"
+            })
         } else if (headerToken === undefined || error) {
             res.send({
                 errno: -1,
@@ -61,7 +68,16 @@ class Auth {
                 message: "无权访问,请重新登录"
             })
         } else {
-            next()
+            if(decode.username === expectUsername){
+                next()
+            }else {
+                res.send({
+                    errno: -1,
+                    error,
+                    message: "token错误,请重新登录获取"
+                })
+            }
+
         }
     }
 

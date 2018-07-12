@@ -48,8 +48,8 @@ router(app)
 //   next(createError(404));
 // });
 app.use(function (req, res, next) {
-    res.state(404)
-    // res.status(404)
+    // res.state(404)
+    res.status(404)
     res.send({
         errno: 4,
         message: '404 没有找到页面',

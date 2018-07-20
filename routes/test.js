@@ -1,8 +1,9 @@
-var express = require('express');
-var router = express.Router();
-var rf = require("fs");
-var multer = require('multer')
+let express = require('express');
+let router = express.Router();
+let rf = require("fs");
+let multer = require('multer')
 
+let config = require("../config")
 
 let fileWithExtension
 let storage = multer.diskStorage({
@@ -20,7 +21,7 @@ let storage = multer.diskStorage({
     }
 })
 
-var upload = multer({storage: storage})
+let upload = multer({storage: storage})
 
 router.get('/', async (req, res, next) => {
     let data = await read().then((data) => {
@@ -50,15 +51,15 @@ router.post('/upload', upload.any(), function (req, res, next) {
     // req.body 将具有文本域数据，如果存在的话
 
     let imgFile = req.files[0]
-    log(req.body)
+
     res.send({
         errno: 0,
         file: imgFile,
         author: req.body.author,
         data: [
-            "//127.0.0.1:10010" + "/static/images/" + fileWithExtension
-        ]
-
+            "//127.0.0.1:"+ config.dev.port+ "/static/images/" + fileWithExtension
+        ],
+        message:"已保存文件"
     })
 })
 

@@ -7,7 +7,7 @@ class Article {
 
     }
 
-     async getArticleList(req, res, next) {
+    async getArticleList(req, res, next) {
 
         let page = req.query.page > 0 ? req.query.page : 1 //设置当前页数，没有则设置为1
 
@@ -18,7 +18,7 @@ class Article {
 
 
         let sql = "select  id,title,description,dateline,banner_img,author,fuck_date,tags,agree,disagree from hos_article order by dateline desc limit "
-        // let sql = "select * from hos_article order by dateline desc limit "
+            // let sql = "select * from hos_article order by dateline desc limit "
             + offset + ","
             + num;
 
@@ -32,7 +32,7 @@ class Article {
     async getArticleById(req, res, next) {
 
         let id = req.params.id
-        let sql = "select * from hos_article WHERE id= "+id;
+        let sql = "select * from hos_article WHERE id= " + id;
 
         const row = await query(sql).catch((err) => {
             console.log(err)
@@ -40,7 +40,6 @@ class Article {
         res.send(returnRes(row))
 
     }
-
 
 }
 

@@ -15,12 +15,45 @@ class Collection {
             + "  WHERE hos_article.id IN ("
             + "  SELECT article_id FROM hos_collection WHERE user_id=? GROUP BY article_id"
             + " ) AND hos_collection.article_id=hos_article.id AND user_id=? AND hos_user.id=?;"
-        const row = await query(sql, [userId,userId,userId]).catch((err) => {
+        const row = await query(sql, [userId, userId, userId]).catch((err) => {
             console.log(err)
             return err.message
         })
         res.send(returnRes(row))
     }
+
+    // 执行收藏/取消收藏
+    async collect(req, res, next) {
+        let userId = req.body.userId
+        let articleId = req.body.articleId
+        let collect = req.body.collect  // 1 是执行收藏,0 是取消收藏
+
+        let sql
+        if (collect === 1) {
+            sql = "insert into hos_collection(user_id, article_id) values (?,?);";
+        } else {
+            sql = "DELETE FROM hos_collection WHERE user_id=? AND article_id=?;";
+        }
+        const row = await query(sql, [userId, articleId]).catch((err) => {
+            console.log(err)
+            return err.message
+        })
+
+        if (row.affectedRows > 0) {
+            res.send({
+                errno: 0,
+                data: row,
+                message: "收藏成功"
+            })
+        } else {
+            res.send({
+                errno: 2,
+                data: row[0],
+                message: "收藏失败"
+            })
+        }
+    }
+
 }
 
 export default new Collection()

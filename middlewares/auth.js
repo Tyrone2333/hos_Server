@@ -1,5 +1,6 @@
 /**
- * 过期的token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJvb3QiLCJzYWx0IjoiZjVjODI4ZmYxMjJjZDhkMDUwOTA1MTU4NDIzNmNjZWIyOGM3OGJmYSIsImlhdCI6MTUzMTI3NTY3NywiZXhwIjoxNTMxMjc1NjgyfQ.7Z6K1wK72psCBwV1BGgUSOq7gJyqiqUlXx6D77nAV-U
+ * 过期的token:
+ * eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJvb3QiLCJzYWx0IjoiZjVjODI4ZmYxMjJjZDhkMDUwOTA1MTU4NDIzNmNjZWIyOGM3OGJmYSIsImlhdCI6MTUzMTI3NTY3NywiZXhwIjoxNTMxMjc1NjgyfQ.7Z6K1wK72psCBwV1BGgUSOq7gJyqiqUlXx6D77nAV-U
  */
 
 class Auth {
@@ -50,14 +51,14 @@ class Auth {
 
         if (error !== undefined && error.message === "jwt expired") {
             res.send({
-                errno: 2,
+                errno: 401,
                 decode,
                 error,
                 message: "验证过期，请重新登录"
             })
         }else if (error !== undefined && error.message === "jwt must be provided") {
             res.send({
-                errno: -1,
+                errno: 401,
                 error,
                 message: "没有token信息,请登录"
             })
@@ -80,6 +81,8 @@ class Auth {
 
         }
     }
+
+
 
     async test(req, res, next) {
         res.send({

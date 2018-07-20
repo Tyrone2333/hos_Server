@@ -63,7 +63,7 @@ export default class User {
                 res.send({
                     errno: 0,
                     token,
-                    userinfo:user,
+                    userinfo: user,
                     message: "登录成功"
                 })
             } else {
@@ -81,6 +81,87 @@ export default class User {
             })
         }
     }
+
+    // 使用token免密登录
+    static async tokenLogin(req, res, next) {
+        let {username} = req.body
+
+        const jwt = require('jsonwebtoken');
+        let headerToken = req.headers["token"] || req.body.token
+        let expectUsername = req.body.username
+        let decode, error
+
+        jwt.verify(headerToken, "enzo server secret key", function (err, decoded) {
+            if (err) {
+                error = err
+            }
+            decode = decoded
+        });
+
+        if (error !== undefined && error.message === "jwt expired") {
+            res.send({
+                errno: 401,
+                decode,
+                error,
+                message: "验证过期，请重新登录"
+            })
+        } else if (error !== undefined && error.message === "jwt must be provided") {
+            res.send({
+                errno: 401,
+                error,
+                message: "没有token信息,请登录"
+            })
+        } else if (headerToken === undefined || error) {
+            res.send({
+                errno: -1,
+                error,
+                message: "无权访问,请重新登录"
+            })
+        } else {
+            // token验证成功了
+            if (decode.username === expectUsername) {
+                let selectSql = "SELECT * FROM hos_user WHERE username=?"
+                const row = await query(selectSql, username).catch((err) => {
+                    console.log(err)
+                    return err.message
+                })
+
+                if (row.length > 0) {
+                    let user = {}
+                    for (let key in row[0]) {
+                        user[key] = row[0][key]
+                    }
+                    delete user.salt
+                    delete user.pwd
+
+                    let token = await Auth.getToken(username)
+
+                    res.send({
+                        errno: 0,
+                        token,
+                        userinfo: user,
+                        message: "登录成功"
+                    })
+                } else {
+                    res.send({
+                        errno: -1,
+                        row: row,
+                        message: "用户不存在"
+                    })
+                }
+            } else {
+                res.send({
+                    errno: 401,
+                    error,
+                    message: "token错误,请重新登录获取"
+                })
+            }
+
+        }
+
+
+    }
+
 
     static async getUserInfo(req, res, next) {
 

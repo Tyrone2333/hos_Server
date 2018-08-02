@@ -39,16 +39,29 @@ class Collection {
             return err.message
         })
 
+        // 返回收藏列表
+        let sqlCollectList = "SELECT article_id,title,dateline,banner_img,author,fuck_date,tags,agree"
+            + " FROM hos_collection ,hos_article,hos_user "
+            + "  WHERE hos_article.id IN ("
+            + "  SELECT article_id FROM hos_collection WHERE user_id=? GROUP BY article_id"
+            + " ) AND hos_collection.article_id=hos_article.id AND user_id=? AND hos_user.id=?;"
+        const row2 = await query(sqlCollectList, [userId, userId, userId]).catch((err) => {
+            console.log(err)
+            return err.message
+        })
+
         if (row.affectedRows > 0) {
             res.send({
                 errno: 0,
-                data: row,
+                res: row,
+                data:row2,
                 message: "收藏成功"
             })
         } else {
             res.send({
                 errno: 2,
-                data: row[0],
+                res: row[0],
+                data:row2,
                 message: "收藏失败"
             })
         }

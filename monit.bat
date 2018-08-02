@@ -1,4 +1,5 @@
 @echo off
+
 call pm2 start  ./monit.json
 echo utf-8
 echo Â·¾¶  %cd%

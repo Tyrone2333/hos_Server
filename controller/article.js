@@ -41,6 +41,61 @@ class Article {
 
     }
 
+    async publicArticle(req, res, next) {
+
+        let title = req.body.title
+        let author = req.body.author
+        let description = req.body.description
+        let content = req.body.content
+        let md = req.body.md
+        let banner_img = req.body.banner_img
+        let author_id = req.body.author_id
+        let fuck_date = req.body.fuck_date
+        let tags = req.body.tags
+        let dateline = Math.round(new Date().getTime() / 1000)
+
+        // 验证
+        let editError;
+        if (title === '') {
+            editError = '标题不能是空的。';
+        } else if (title.length < 4 || title.length > 100) {
+            editError = '标题字数太多或太少。';
+        } else if (tags === "") {
+            editError = '必须选择一个版块。';
+        } else if (content === '') {
+            editError = '内容不可为空';
+        }
+        // END 验证
+        if(editError){
+            res.send({
+                errno: 2,
+                message: editError,
+            })
+        }
+        let sql = "insert into hos_article(title, author,author_id, description, content,md,banner_img,dateline,fuck_date,tags)"
+            + " values(?,?,?,?,?,?,?,?,?,?)";
+
+        let row = await query(sql, [title, author, author_id, description, content, md, banner_img, dateline, fuck_date, tags]).catch((err) => {
+            console.log(err)
+            return err.message
+        })
+
+        if (row.affectedRows > 0) {
+            res.send({
+                errno: 0,
+                data: row,
+                article_id:row.insertId,
+                message: "发布成功"
+            })
+        } else {
+            res.send({
+                errno: 2,
+                data: row,
+                message: "发布失败",
+            })
+        }
+    }
+
 }
 
 export default new Article()

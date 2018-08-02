@@ -1,6 +1,5 @@
 
 import Auth from "../middlewares/auth"
-
 import Article from "../controller/article"
 
 let express = require('express');
@@ -10,6 +9,8 @@ let multer = require('multer')
 // 获取所有文章
 router.get('/', Article.getArticleList)
 router.get('/:id', Article.getArticleById)
+// 发布文章
+router.post('/public',Auth.checkUser, Article.publicArticle)
 
 // 上传文件 begin
 let fileWithExtension
@@ -29,7 +30,7 @@ let storage = multer.diskStorage({
 })
 let upload = multer({storage: storage})
 let config = require("../config")
-router.post('/upload_img',Auth.checkUser,upload.any(),function (req, res, next) {
+router.post('/upload_img',upload.any(),function (req, res, next) {
     // req.file 是文件的信息
     // req.body 将具有文本域数据，如果存在的话
 

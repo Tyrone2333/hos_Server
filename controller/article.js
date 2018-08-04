@@ -4,8 +4,13 @@
 
 class Article {
     constructor() {
-
+        this.getArticleList = this.getArticleList.bind(this)
+        this.getArticleById = this.getArticleById.bind(this)
+        // this.getCommentByArticle = this.getCommentByArticle.bind(this)
     }
+
+
+
 
     async getArticleList(req, res, next) {
 
@@ -37,7 +42,23 @@ class Article {
         const row = await query(sql).catch((err) => {
             console.log(err)
         })
-        res.send(returnRes(row))
+        const reply = await this.getCommentByArticle(id).catch(err => {
+            console.error(err)
+        })
+
+        if (row.length > 0) {
+            res.send({
+                errno: 0,
+                data: row,
+                reply
+            })
+        } else {
+            res.send({
+                errno: 2,
+                data: row[0],
+                message: "查询为空",
+            })
+        }
 
     }
 
@@ -66,7 +87,7 @@ class Article {
             editError = '内容不可为空';
         }
         // END 验证
-        if(editError){
+        if (editError) {
             res.send({
                 errno: 2,
                 message: editError,
@@ -84,7 +105,7 @@ class Article {
             res.send({
                 errno: 0,
                 data: row,
-                article_id:row.insertId,
+                article_id: row.insertId,
                 message: "发布成功"
             })
         } else {
@@ -92,6 +113,79 @@ class Article {
                 errno: 2,
                 data: row,
                 message: "发布失败",
+            })
+        }
+    }
+
+    // 返回评论而不是res.send
+    async getCommentByArticle(article_id) {
+
+        let sql = "SELECT   hos_comment.id AS 'comment_id',from_id, to_id, content, timestamp, article_id, from_nickname, to_nickname,hos_user.avatar "
+            + " FROM hos_comment,hos_user  WHERE article_id=? AND from_id=hos_user.id"
+            + " ORDER BY timestamp ASC"
+
+        let row = await query(sql, [article_id]).catch((err) => {
+            console.log(err)
+            return err.message
+        })
+
+        return row
+
+    }
+
+    async reply(req, res, next) {
+
+        // from_id, to_id, content, timestamp, article_id, from_nickname, to_nickname
+        let from_id = req.body.from_id
+        let to_id = req.body.to_id
+        let content = req.body.content
+        let timestamp = Math.round(new Date().getTime() / 1000)
+        let article_id = req.body.article_id
+        let from_nickname = req.body.from_nickname
+        let to_nickname = req.body.to_nickname
+
+        // 验证
+        let editError;
+        if (content === '') {
+            editError = '内容不能是空的。';
+        } else if (content.length < 4 || content.length > 400) {
+            editError = '字数太多或太少。';
+        } else if (!from_id ) {
+            editError = '没有回复主体';
+        }else if (from_id !== req.body.id) {
+            editError = '用户信息有误';
+        }else if (to_id === req.body.id) {
+            editError = '不能@自己哦';
+        }
+        // END 验证
+        if (editError) {
+            res.send({
+                errno: 2,
+                message: editError,
+            })
+            return
+        }
+
+        let sql = "INSERT INTO hos_comment(from_id, to_id, content, timestamp, article_id, from_nickname, to_nickname) " +
+            "  VALUE (?,?,?,?,?,?,?);"
+
+        let row = await query(sql, [from_id, to_id, content, timestamp, article_id, from_nickname, to_nickname]).catch((err) => {
+            console.log(err)
+            return err.message
+        })
+
+        if (row.affectedRows > 0) {
+            res.send({
+                errno: 0,
+                row_insertId: row.insertId,
+                message: "评论成功",
+                body:req.body
+            })
+        } else {
+            res.send({
+                errno: 2,
+                data: row,
+                message: "评论失败",
             })
         }
     }

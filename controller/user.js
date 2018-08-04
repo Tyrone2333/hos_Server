@@ -7,13 +7,14 @@ export default class User {
     }
 
     static async register(req, res, next) {
-        let {username, pwd} = req.body
+        let {username, pwd,nickname} = req.body
 
         let salt = getSha1("fucksalt" + username)
         let password = getSha1(username + pwd + salt)
         let user = {
             username,
             pwd: password,
+            nickname,
             salt,
             register_time: Math.round(new Date().getTime() / 1000)
         }

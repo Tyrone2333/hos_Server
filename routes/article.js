@@ -11,6 +11,7 @@ router.get('/', Article.getArticleList)
 router.get('/:id', Article.getArticleById)
 // 发布文章
 router.post('/public',Auth.checkUser, Article.publicArticle)
+router.post('/reply',Auth.checkUser, Article.reply)
 
 // 上传文件 begin
 let fileWithExtension

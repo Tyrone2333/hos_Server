@@ -10,8 +10,6 @@ class Article {
     }
 
 
-
-
     async getArticleList(req, res, next) {
 
         let page = req.query.page > 0 ? req.query.page : 1 //设置当前页数，没有则设置为1
@@ -120,11 +118,15 @@ class Article {
     // 返回评论而不是res.send
     async getCommentByArticle(article_id) {
 
-        let sql = "SELECT   hos_comment.id AS 'comment_id',from_id, to_id, content, timestamp, article_id, from_nickname, to_nickname,hos_user.avatar "
-            + " FROM hos_comment,hos_user  WHERE article_id=? AND from_id=hos_user.id"
-            + " ORDER BY timestamp ASC"
-
-        let row = await query(sql, [article_id]).catch((err) => {
+        let sql = `SELECT A.id AS 'comment_id', A.from_id,B.nickname AS 'from_nickname',
+                    A.to_id,C.nickname AS 'to_nickname',timestamp, article_id,B.avatar, content,
+                      CASE WHEN A.to_id=(SELECT hos_article.author_id FROM hos_article WHERE hos_article.id=?) THEN 1 ELSE 0
+                      END AS 'is_for_author'
+                    FROM hos_comment A
+                      INNER JOIN hos_user B ON A.from_id=B.id
+                      INNER JOIN hos_user C ON A.to_id=C.id
+                    WHERE A.article_id=? ORDER BY timestamp DESC`
+        let row = await query(sql, [article_id, article_id]).catch((err) => {
             console.log(err)
             return err.message
         })
@@ -133,6 +135,7 @@ class Article {
 
     }
 
+    // 评论
     async reply(req, res, next) {
 
         // from_id, to_id, content, timestamp, article_id, from_nickname, to_nickname
@@ -150,11 +153,11 @@ class Article {
             editError = '内容不能是空的。';
         } else if (content.length < 4 || content.length > 400) {
             editError = '字数太多或太少。';
-        } else if (!from_id ) {
+        } else if (!from_id) {
             editError = '没有回复主体';
-        }else if (from_id !== req.body.id) {
+        } else if (from_id !== req.body.id) {
             editError = '用户信息有误';
-        }else if (to_id === req.body.id) {
+        } else if (to_id === req.body.id) {
             editError = '不能@自己哦';
         }
         // END 验证
@@ -166,10 +169,10 @@ class Article {
             return
         }
 
-        let sql = "INSERT INTO hos_comment(from_id, to_id, content, timestamp, article_id, from_nickname, to_nickname) " +
-            "  VALUE (?,?,?,?,?,?,?);"
+        let sql = "INSERT INTO hos_comment(from_id, to_id, content, timestamp, article_id) " +
+            "  VALUE (?,?,?,?,?);"
 
-        let row = await query(sql, [from_id, to_id, content, timestamp, article_id, from_nickname, to_nickname]).catch((err) => {
+        let row = await query(sql, [from_id, to_id, content, timestamp, article_id]).catch((err) => {
             console.log(err)
             return err.message
         })
@@ -179,7 +182,6 @@ class Article {
                 errno: 0,
                 row_insertId: row.insertId,
                 message: "评论成功",
-                body:req.body
             })
         } else {
             res.send({

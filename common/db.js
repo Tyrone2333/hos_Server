@@ -3,16 +3,16 @@ import mysql from 'mysql'
 let pool
 if (process.env.NODE_ENV === "production") {
     pool = mysql.createPool({
-        host: '***',
-        user: '***',
-        password: '***',
+        host: '176.122.171.36',
+        user: 'root',
+        password: 'wcnmbgpz',
         database: 'bdm289907541_db'
     })
 } else {
     pool = mysql.createPool({
         host: '127.0.0.1',
         user: 'root',
-        password: '***',
+        password: 'wcnmbgpz',
         database: 'bdm289907541_db'
     })
 }

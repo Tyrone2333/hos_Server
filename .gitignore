@@ -3,7 +3,7 @@ node_modules/
 dist/
 npm-debug.log
 yarn-error.log
-public/images
+
 
 # Editor directories and files
 .idea
@@ -12,3 +12,5 @@ public/images
 *.ntvs*
 *.njsproj
 *.sln
+common/db.js
+public/images

@@ -21,6 +21,28 @@ class Collection {
         })
         res.send(returnRes(row))
     }
+    async getUserCollection(userId, page) {
+        //每页显示100条数据
+        let num = 100;
+        // 获取limit的第一个参数的值 offset ，(传入的页数-1) * 每页的数据 得到limit第一个参数的值
+        let offset = (page - 1) * num;
+
+        let sql = "SELECT article_id,title,dateline,banner_img,author,fuck_date,tags,agree"
+            + " FROM hos_collection ,hos_article,hos_user "
+            + "  WHERE hos_article.id IN ("
+            + "  SELECT article_id FROM hos_collection WHERE user_id=? GROUP BY article_id"
+            + " ) AND hos_collection.article_id=hos_article.id AND user_id=? AND hos_user.id=?  limit "
+            + offset + ","
+            + num;
+
+        const row = await query(sql, [userId, userId,userId]).catch((err) => {
+            console.log(err)
+        })
+
+        return row
+    }
+
+
 
     // 执行收藏/取消收藏
     async collect(req, res, next) {

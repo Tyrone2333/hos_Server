@@ -17,4 +17,5 @@ router.post('/token_login', User.tokenLogin)
 router.get('/:id', User.getUserInfo)
 
 
+
 module.exports = router;

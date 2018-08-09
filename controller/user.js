@@ -1,5 +1,6 @@
 import Auth from "../middlewares/auth"
-
+import Article from "./article"
+import Collection from "./collection"
 
 export default class User {
     constructor() {
@@ -7,7 +8,7 @@ export default class User {
     }
 
     static async register(req, res, next) {
-        let {username, pwd,nickname} = req.body
+        let {username, pwd, nickname} = req.body
 
         let salt = getSha1("fucksalt" + username)
         let password = getSha1(username + pwd + salt)
@@ -167,13 +168,45 @@ export default class User {
     static async getUserInfo(req, res, next) {
 
         let userId = req.params.id
+        let page = req.query.page > 0 ? req.query.page : 1 //设置当前页数，没有则设置为1
 
         log(userId)
         let sql = 'select * from hos_user where id=?'
         const row = await query(sql, [userId]).catch((err) => {
-            console.log(err)
+            console.error(err)
         })
-        res.send(returnRes(row))
+
+        let userArticle = await Article.getUserArticle(userId, page).catch((err) => {
+            console.error(err)
+        })
+        let userCollection = await Collection.getUserCollection(userId, page).catch((err) => {
+            console.error(err)
+        })
+
+
+        if (row.length > 0) {
+            let user = {}
+            for (let key in row[0]) {
+                user[key] = row[0][key]
+            }
+            delete user.salt
+            delete user.pwd
+
+            res.send({
+                errno: 0,
+                data: {
+                    userInfo: user,
+                    userArticle,
+                    userCollection
+                }
+            })
+        } else {
+            res.send({
+                errno: 2,
+                data: row,
+                message: "查询为空",
+            })
+        }
     }
 
 

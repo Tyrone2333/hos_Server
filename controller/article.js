@@ -179,8 +179,6 @@ class Article {
             editError = '没有回复主体';
         } else if (from_id !== req.body.id) {
             editError = '用户信息有误';
-        } else if (to_id === req.body.id) {
-            editError = '不能@自己哦';
         }
         // END 验证
         if (editError) {
@@ -212,6 +210,24 @@ class Article {
                 message: "评论失败",
             })
         }
+    }
+
+
+    // 投票(点赞),后续可能有对评论,文章,主页的点赞
+    // 应该单独拉出来用缓存来做,臣妾现在还做不到
+    // 还应考虑网红发文,突然点赞人数暴涨
+    //
+
+    // id	主键
+    // type_id	对应的作品或评论的id
+    // type	点赞类型  1作品点赞  2 评论点赞 3....
+    // user_id	用户id
+    // status	点赞状态  0--取消赞   1--有效赞
+
+    // 这样的表结构也并不好,有些大v的文章可能会得到几十万的点赞，这样就会产生几十万条数据,而普通人
+    // 可能就一两个赞
+    async vote(req, res, next) {
+
     }
 
 }

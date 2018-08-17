@@ -21,6 +21,8 @@ class Collection {
         })
         res.send(returnRes(row))
     }
+
+    //  返回用户的收藏
     async getUserCollection(userId, page) {
         //每页显示100条数据
         let num = 100;
@@ -81,7 +83,7 @@ class Collection {
             })
         } else {
             res.send({
-                errno: 2,
+                errno: -1,
                 res: row[0],
                 data:row2,
                 message: "收藏失败"

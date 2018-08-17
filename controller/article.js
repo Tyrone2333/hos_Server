@@ -15,15 +15,15 @@ class Article {
         let page = req.query.page > 0 ? req.query.page : 1 //设置当前页数，没有则设置为1
 
         //每页显示10条数据
-        let num = 10;
+        let num = 10
         // 获取limit的第一个参数的值 offset ，(传入的页数-1) * 每页的数据 得到limit第一个参数的值
-        let offset = (page - 1) * num;
+        let offset = (page - 1) * num
 
 
         let sql = "select  id,title,description,dateline,banner_img,author,fuck_date,tags,agree,disagree from hos_article order by dateline desc limit "
             // let sql = "select * from hos_article order by dateline desc limit "
             + offset + ","
-            + num;
+            + num
 
         const row = await query(sql).catch((err) => {
             console.log(err)
@@ -34,7 +34,7 @@ class Article {
     async getArticleById(req, res, next) {
 
         let id = req.params.id
-        let sql = "select * from hos_article WHERE id= " + id;
+        let sql = "select * from hos_article WHERE id= " + id
 
         const row = await query(sql).catch((err) => {
             console.log(err)
@@ -73,25 +73,25 @@ class Article {
         let dateline = Math.round(new Date().getTime() / 1000)
 
         // 验证
-        let editError;
+        let editError
         if (title === '') {
-            editError = '标题不能是空的。';
+            editError = '标题不能是空的。'
         } else if (title.length < 4 || title.length > 100) {
-            editError = '标题字数太多或太少。';
+            editError = '标题字数太多或太少。'
         } else if (tags === "") {
-            editError = '必须选择一个版块。';
+            editError = '必须选择一个版块。'
         } else if (content === '') {
-            editError = '内容不可为空';
+            editError = '内容不可为空'
         }
         // END 验证
         if (editError) {
             res.send({
-                errno: 2,
+                errno: 3,
                 message: editError,
             })
         }
         let sql = "insert into hos_article(title, author,author_id, description, content,md,banner_img,dateline,fuck_date,tags)"
-            + " values(?,?,?,?,?,?,?,?,?,?)";
+            + " values(?,?,?,?,?,?,?,?,?,?)"
 
         let row = await query(sql, [title, author, author_id, description, content, md, banner_img, dateline, fuck_date, tags]).catch((err) => {
             console.log(err)
@@ -107,14 +107,14 @@ class Article {
             })
         } else {
             res.send({
-                errno: 2,
+                errno: -1,
                 data: row,
                 message: "发布失败",
             })
         }
     }
 
-    // 返回评论而不是res.send
+    //  返回评论而不是res.send
     async getCommentByArticle(article_id) {
 
         let sql = `SELECT A.id AS 'comment_id', A.from_id,B.nickname AS 'from_nickname',
@@ -134,21 +134,40 @@ class Article {
 
     }
 
+    //  返回评论而不是res.send
+    async getUserComment(user_id) {
+
+        let sql = `SELECT A.id AS 'comment_id', A.from_id,B.nickname AS 'from_nickname',
+                      A.to_id,C.nickname AS 'to_nickname',timestamp, article_id,B.avatar,D.title, A.content AS 'comment_content'
+                    FROM hos_comment A
+                      LEFT JOIN hos_user B ON A.from_id=B.id
+                      LEFT JOIN hos_user C ON A.to_id=C.id
+                      LEFT JOIN hos_article D ON D.id=A.article_id
+                    WHERE A.from_id=? ORDER BY timestamp DESC`
+        let row = await query(sql, [user_id]).catch((err) => {
+            console.log(err)
+            return err.message
+        })
+
+        return row
+
+    }
+
     // 返回用户写的文章
     async getUserArticle(userId, page) {
         // let userId = req.params.id
         // let page = req.query.page > 0 ? req.query.page : 1 //设置当前页数，没有则设置为1
 
         //每页显示100条数据
-        let num = 100;
+        let num = 100
         // 获取limit的第一个参数的值 offset ，(传入的页数-1) * 每页的数据 得到limit第一个参数的值
-        let offset = (page - 1) * num;
+        let offset = (page - 1) * num
 
 
         let sql = " select  id AS 'article_id',title,description,dateline,banner_img,author,fuck_date,tags,agree,disagree from hos_article " +
             "WHERE author_id=? order by dateline desc limit "
             + offset + ","
-            + num;
+            + num
 
         const row = await query(sql, [userId]).catch((err) => {
             console.log(err)
@@ -157,7 +176,7 @@ class Article {
         return row
     }
 
-    // 评论
+    // 评论发表
     async reply(req, res, next) {
 
         // from_id, to_id, content, timestamp, article_id, from_nickname, to_nickname
@@ -170,27 +189,27 @@ class Article {
         let to_nickname = req.body.to_nickname
 
         // 验证
-        let editError;
+        let editError
         if (content === '') {
-            editError = '内容不能是空的。';
+            editError = '内容不能是空的'
         } else if (content.length < 4 || content.length > 400) {
-            editError = '字数太多或太少。';
+            editError = '字数太多或太少'
         } else if (!from_id) {
-            editError = '没有回复主体';
+            editError = '没有回复主体'
         } else if (from_id !== req.body.id) {
-            editError = '用户信息有误';
+            editError = '用户信息有误'
         }
         // END 验证
         if (editError) {
             res.send({
-                errno: 2,
+                errno: 3,
                 message: editError,
             })
             return
         }
 
         let sql = "INSERT INTO hos_comment(from_id, to_id, content, timestamp, article_id) " +
-            "  VALUE (?,?,?,?,?);"
+            "  VALUE (?,?,?,?,?)"
 
         let row = await query(sql, [from_id, to_id, content, timestamp, article_id]).catch((err) => {
             console.log(err)
@@ -205,7 +224,7 @@ class Article {
             })
         } else {
             res.send({
-                errno: 2,
+                errno: -1,
                 data: row,
                 message: "评论失败",
             })
@@ -234,5 +253,5 @@ class Article {
 
 export default new Article()
 
-// module.exports = new User(user_info);
+// module.exports = new User(user_info)
 

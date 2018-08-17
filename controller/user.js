@@ -170,19 +170,24 @@ export default class User {
         let userId = req.params.id
         let page = req.query.page > 0 ? req.query.page : 1 //设置当前页数，没有则设置为1
 
-        log(userId)
         let sql = 'select * from hos_user where id=?'
         const row = await query(sql, [userId]).catch((err) => {
             console.error(err)
+            return []
         })
 
         let userArticle = await Article.getUserArticle(userId, page).catch((err) => {
             console.error(err)
+            return []
+        })
+        let userComment = await Article.getUserComment(userId).catch((err) => {
+            console.error(err)
+            return []
         })
         let userCollection = await Collection.getUserCollection(userId, page).catch((err) => {
             console.error(err)
+            return []
         })
-
 
         if (row.length > 0) {
             let user = {}
@@ -197,7 +202,11 @@ export default class User {
                 data: {
                     userInfo: user,
                     userArticle,
-                    userCollection
+                    userCollection,
+                    // 现在只有评论,以后可能有其他拓展
+                    userReply:{
+                        comment:userComment,
+                    } ,
                 }
             })
         } else {

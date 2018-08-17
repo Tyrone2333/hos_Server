@@ -23,7 +23,7 @@ export default class Hos {
 
         if (error !== undefined && error.message === "jwt expired") {
             res.send({
-                errno: 2,
+                errno: 401,
                 token,
                 temp: getSha1("enzo"),
                 decode,

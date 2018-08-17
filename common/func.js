@@ -15,7 +15,7 @@ var styles = {
     'red'           : ['\x1B[31m', '\x1B[39m'],
     'yellow'        : ['\x1B[33m', '\x1B[39m'],
     'whiteBG'       : ['\x1B[47m', '\x1B[49m'],
-    'greyBG'        : ['\x1B[49;5;8m', '\x1B[49m'],
+    'greyBG'        : ['\x1B[4958m', '\x1B[49m'],
     'blackBG'       : ['\x1B[40m', '\x1B[49m'],
     'blueBG'        : ['\x1B[44m', '\x1B[49m'],
     'cyanBG'        : ['\x1B[46m', '\x1B[49m'],
@@ -23,7 +23,7 @@ var styles = {
     'magentaBG'     : ['\x1B[45m', '\x1B[49m'],
     'redBG'         : ['\x1B[41m', '\x1B[49m'],
     'yellowBG'      : ['\x1B[43m', '\x1B[49m']
-};
+}
 
 export function log(info) {
     if (typeof info === "string"  ) {
@@ -53,11 +53,11 @@ export function returnRes(row) {
 }
 
 export function getSha1(str) {
-    var crypto = require('crypto');
-    var sha1 = crypto.createHash("sha1");//定义加密方式:md5不可逆,此处的md5可以换成任意hash加密的方法名称；
-    sha1.update(str);
-    var res = sha1.digest("hex");  //加密后的值d
-    return res;
+    var crypto = require('crypto')
+    var sha1 = crypto.createHash("sha1")//定义加密方式:md5不可逆,此处的md5可以换成任意hash加密的方法名称；
+    sha1.update(str)
+    var res = sha1.digest("hex")  //加密后的值d
+    return res
 }
 
 // export {log,returnRes,getSha1}

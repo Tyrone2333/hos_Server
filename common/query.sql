@@ -71,23 +71,6 @@ FROM hos_user,hos_comment
 WHERE hos_comment.article_id=110
       AND hos_comment.from_id=hos_user.id;
 
-#可查所有评论,带to_nickname,from_nickname(曲线救国法)
-SELECT t.*,p.to_id,p.to_nickname FROM (
-  SELECT   hos_comment.id AS 'comment_id',
-    from_id,hos_user.nickname AS 'from_nickname',
-    timestamp, article_id,hos_user.avatar, content,
-    CASE WHEN hos_comment.to_id=(SELECT hos_article.author_id FROM hos_article WHERE hos_article.id=110) THEN 1 ELSE 0
-    END AS 'is_for_author'
-  FROM hos_comment ,hos_user
-  WHERE article_id=110 AND from_id=hos_user.id
-  ORDER BY timestamp DESC
-) t,(
-  SELECT hos_comment.id AS 'comment_id', hos_comment.to_id,hos_user.nickname AS 'to_nickname'
-  FROM hos_user,hos_comment
-  WHERE hos_comment.article_id=110
-        AND hos_comment.to_id=hos_user.id
-)  p
-WHERE t.comment_id=p.comment_id;
 
 #可查所有评论,带to_nickname,from_nickname
 SELECT A.id AS 'comment_id', A.from_id,B.nickname AS 'from_nickname',

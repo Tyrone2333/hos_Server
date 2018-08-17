@@ -28,6 +28,8 @@ router.get('/', async (req, res, next) => {
         log("先then一下")
         return data
     })
+
+    res.status(200)
     res.send({
         status: 200,
         // watch:"in watch???",

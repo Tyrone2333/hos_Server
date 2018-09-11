@@ -55,7 +55,7 @@ WHERE hos_user.id=hos_collection.user_id AND article_id=109;
 
 # 插入评论
 INSERT INTO hos_comment( from_id, to_id, content, timestamp, article_id)
-  VALUE (1, 38, '学会了ES6，就不会写出那样的代码.声明变量的新姿势,用let不用var', 1533194273, 110);
+  VALUE (1, 38, '不用var', 1533194273, 110);
 
 
 # 可查to_nickname
@@ -83,5 +83,16 @@ FROM hos_comment A
 WHERE A.article_id=110 ORDER BY timestamp DESC
 
 
+# 获取收藏
+SELECT article_id,title,dateline,banner_img,author,fuck_date,tags,agree
+ FROM hos_collection ,hos_article,hos_user
+  WHERE hos_article.id IN (
+ SELECT article_id FROM hos_collection WHERE user_id=1 GROUP BY article_id
+ ) AND hos_collection.article_id=hos_article.id AND user_id=1 AND hos_user.id=1;
 
+# 获取收藏2 如果文章被删除就会多一条全是 null 的记录
+SELECT C.article_id,A.title,A.dateline,A.banner_img,A.author,A.fuck_date,A.tags,A.agree
+FROM hos_collection C
+LEFT JOIN hos_article A on A.id=C.article_id
+where user_id=1;
 

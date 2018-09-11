@@ -28,18 +28,23 @@ class Auth {
         })
 
         let data = {
+            userId: row[0].id,
             username: row[0].username,
-            salt: row[0].salt
         }
 
         return jwt.sign(data, this.secretOrPrivateKey, {expiresIn: this.expiresTime})
     }
 
-    // 验证用户是否登录
+    //  用于客户端自动刷新 token
+    async refreshToken() {
+
+    }
+
+    //  验证用户是否登录
     async checkUser(req, res, next) {
         const jwt = require('jsonwebtoken');
-        let headerToken = req.body.token || req.headers["token"]
-        let expectUsername = req.body.username
+        let headerToken = req.headers["authorization"] || req.body.token || null
+        // let expectUsername = req.body.username
 
         let decode, error
         jwt.verify(headerToken, this.secretOrPrivateKey, function (err, decoded) {
@@ -69,7 +74,13 @@ class Auth {
                 message: "无权访问,请重新登录"
             })
         } else {
-            if (decode.username === expectUsername) {
+            // TODO 待修改,验证方式存在安全问题
+            if (decode.username && decode.userId) {
+                // 把存着的用户信息放置  req.userInfo 方便后面路由使用
+                req.userInfo = {
+                    userId: decode.userId,
+                    username: decode.username
+                }
                 next()
             } else {
                 res.send({

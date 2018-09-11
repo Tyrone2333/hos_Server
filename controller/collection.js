@@ -37,7 +37,7 @@ class Collection {
             + offset + ","
             + num;
 
-        const row = await query(sql, [userId, userId,userId]).catch((err) => {
+        const row = await query(sql, [userId, userId, userId]).catch((err) => {
             console.log(err)
         })
 
@@ -45,10 +45,10 @@ class Collection {
     }
 
 
-
     // 执行收藏/取消收藏
     async collect(req, res, next) {
-        let userId = req.body.userId
+        // let userId = req.body.userId
+        let userId = req.userInfo.userId
         let articleId = req.body.articleId
         let collect = req.body.collect  // 1 是执行收藏,0 是取消收藏
 
@@ -63,29 +63,36 @@ class Collection {
             return err.message
         })
 
-        // 返回收藏列表
+        // 返回经过修改后的收藏列表
         let sqlCollectList = "SELECT article_id,title,dateline,banner_img,author,fuck_date,tags,agree"
             + " FROM hos_collection ,hos_article,hos_user "
             + "  WHERE hos_article.id IN ("
             + "  SELECT article_id FROM hos_collection WHERE user_id=? GROUP BY article_id"
             + " ) AND hos_collection.article_id=hos_article.id AND user_id=? AND hos_user.id=?;"
+
+        // 如果文章被删除就会多一条全是 null 的记录
+        // let sqlCollectList = `
+        // SELECT C.article_id,A.title,A.dateline,A.banner_img,A.author,A.fuck_date,A.tags,A.agree
+        // FROM hos_collection C
+        // LEFT JOIN hos_article A on A.id=C.article_id
+        // where user_id=?
+        // `
         const row2 = await query(sqlCollectList, [userId, userId, userId]).catch((err) => {
             console.log(err)
             return err.message
         })
-
         if (row.affectedRows > 0) {
             res.send({
                 errno: 0,
                 res: row,
-                data:row2,
+                data: row2,
                 message: "收藏成功"
             })
         } else {
             res.send({
                 errno: -1,
                 res: row[0],
-                data:row2,
+                data: row2,
                 message: "收藏失败"
             })
         }

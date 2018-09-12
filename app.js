@@ -40,7 +40,7 @@ app.use(express.urlencoded({extended: false}))
 app.use(cookieParser())
 
 // 静态文件
-app.use("/static", express.static(path.join(__dirname, 'public')))
+app.use("/static", express.static(path.join(__dirname, 'static')))
 
 
 router(app)

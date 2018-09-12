@@ -13,6 +13,7 @@
       "ignore_watch": [
         "uploads",
         "public/images",
+        "static/images",
         "node_modules"
       ]
     }

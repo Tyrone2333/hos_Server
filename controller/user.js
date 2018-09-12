@@ -203,7 +203,6 @@ export default class User {
         let {username, userId} = req.userInfo
         let {nickname, age, sex, email, address} = req.body
 
-        log(age)
         let sql = `
         update hos_user set nickname=?,age=?,sex=?,email=?,address=? where id=?
 `
@@ -213,11 +212,25 @@ export default class User {
         })
 
         if (row.affectedRows > 0) {
-            res.send({
-                errno: 0,
-                row,
-                message: '修改成功',
+            let selectSql = "SELECT * FROM hos_user WHERE username=?"
+            const row = await query(selectSql, username).catch((err) => {
+                console.log(err)
+                return err.message
             })
+            if (row.length > 0) {
+                let user = {}
+                for (let key in row[0]) {
+                    user[key] = row[0][key]
+                }
+                delete user.salt
+                delete user.pwd
+
+                res.send({
+                    errno: 0,
+                    userinfo: user,
+                    message: "修改成功"
+                })
+            }
         } else {
             res.send({
                 errno: 1,
@@ -226,7 +239,6 @@ export default class User {
         }
 
     }
-
 
     // 改密
     static async changePwd(req, res, next) {
@@ -262,7 +274,7 @@ export default class User {
                 } else {
                     res.send({
                         errno: 1,
-                        message: "密码修改"
+                        message: "密码修改失败"
                     })
                 }
 

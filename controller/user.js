@@ -98,7 +98,7 @@ export default class User {
             decode = decoded
         });
 
-        if (error !== undefined ) {
+        if (error !== undefined) {
             res.send({
                 errno: 401,
                 decode,
@@ -184,9 +184,9 @@ export default class User {
                     userArticle,
                     userCollection,
                     // 现在只有评论,以后可能有其他拓展
-                    userReply:{
-                        comment:userComment,
-                    } ,
+                    userReply: {
+                        comment: userComment,
+                    },
                 }
             })
         } else {
@@ -196,6 +196,90 @@ export default class User {
                 message: "查询为空",
             })
         }
+    }
+
+    // 改用户信息
+    static async changeInformation(req, res, next) {
+        let {username, userId} = req.userInfo
+        let {nickname, age, sex, email, address} = req.body
+
+        log(age)
+        let sql = `
+        update hos_user set nickname=?,age=?,sex=?,email=?,address=? where id=?
+`
+        const row = await query(sql, [nickname, age, sex, email, address, userId]).catch((err) => {
+            console.log(err)
+            return err.message
+        })
+
+        if (row.affectedRows > 0) {
+            res.send({
+                errno: 0,
+                row,
+                message: '修改成功',
+            })
+        } else {
+            res.send({
+                errno: 1,
+                message: "修改出错了"
+            })
+        }
+
+    }
+
+
+    // 改密
+    static async changePwd(req, res, next) {
+        let {username, userId} = req.userInfo
+        let {oldPwd, newPwd} = req.body
+
+        let selectSql = "SELECT * FROM hos_user WHERE username=?"
+        const row = await query(selectSql, username).catch((err) => {
+            console.log(err)
+            return err.message
+        })
+
+        if (row.length > 0) {
+            let salt = row[0].salt
+            let expectPwd = getSha1(username + oldPwd + salt)
+            // 旧密码验证成功
+            if (row[0].username === username && expectPwd === row[0].pwd) {
+                // 生成新密码
+                let password = getSha1(username + newPwd + salt)
+                let changePwdSql = `  update hos_user set pwd=? where id=? ; `
+                // 修改数据库
+                const row = await query(changePwdSql, [password, userId]).catch((err) => {
+                    console.log(err)
+                    return err.message
+                })
+
+                if (row.affectedRows > 0) {
+                    res.send({
+                        errno: 0,
+                        row,
+                        message: "密码修改成功"
+                    })
+                } else {
+                    res.send({
+                        errno: 1,
+                        message: "密码修改"
+                    })
+                }
+
+            } else {
+                // 旧密码验证失败
+                res.send({
+                    errno: 1,
+                    message: "旧密码错误"
+                })
+            }
+        } else {
+            res.send({
+                errno: 1,
+                message: "修改出错了"
+            })
+        }
+
     }
 
 

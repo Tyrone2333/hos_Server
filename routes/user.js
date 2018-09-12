@@ -13,8 +13,14 @@ router.post('/register', User.register)
 router.post('/login', User.login)
 router.post('/token_login', User.tokenLogin)
 
+// 改密
+router.post('/password',Auth.checkUser, User.changePwd)
+
+
 // 获取用户信息
 router.get('/:id', User.getUserInfo)
+// 改用户信息
+router.post('/information',Auth.checkUser, User.changeInformation)
 
 
 

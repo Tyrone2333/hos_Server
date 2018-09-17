@@ -9,4 +9,5 @@ echo ¿ªÊ¼ %time%
 %SLEEP% 8 > nul
 echo ½áÊø %time%
 
+title "hos_server"
 pm2 logs

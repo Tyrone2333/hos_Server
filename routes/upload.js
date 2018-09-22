@@ -4,6 +4,7 @@
  */
 
 import Auth from "../middlewares/auth"
+import utils from "../helper/utils"
 
 let router = require('express').Router();
 let multer = require('multer')
@@ -20,7 +21,9 @@ let owner
  */
 let storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        // TODO 先判断有没有文件夹,没有就新建,否则会报错崩溃
+        //  先判断有没有文件夹,没有就新建,否则会报错崩溃
+        utils.checkDirExist('static/images/avatar')
+
         let type = req.body.type
         if (type === "article") {
             owner = req.body.author
@@ -95,6 +98,8 @@ function outputFileInfo(req, res, next) {
         owner: owner,
         body: req.body,
         data: [
+
+            // "//dushizz.top:" + config.dev.port + `/${savePath}/` + fileWithExtension
             "//127.0.0.1:" + config.dev.port + `/${savePath}/` + fileWithExtension
         ],
     }

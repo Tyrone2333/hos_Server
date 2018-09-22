@@ -2,6 +2,8 @@ const axios = require("axios")
 const sha1 = require('../helper/sha1')
 const aesDecrypt = require('../helper/aesDecrypt')
 const WXBizDataCrypt = require('../helper/WXBizDataCrypt')
+const path = require('path')
+const fs = require('fs')
 
 let express = require('express');
 let router = express.Router();
@@ -52,6 +54,16 @@ router.post('/', async (req, res, next) => {
     })
     log(3)
 });
+
+import utils from "../helper/utils"
+router.get('/checkDirExist', async (req, res, next) => {
+    utils.checkDirExist("/static/avatar")
+    res.send({
+        status: 200,
+
+    })
+})
+
 
 router.post('/upload', upload.any(), function (req, res, next) {
     // req.file 是文件的信息

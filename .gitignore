@@ -13,5 +13,10 @@ yarn-error.log
 *.njsproj
 *.sln
 public/images
-static/images
+static/images/avatar/*.*
+static/images/*.jpg
+static/images/*.jpeg
+static/images/*.png
+static/images/*.gif
+
 common/db.js

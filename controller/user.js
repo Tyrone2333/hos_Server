@@ -193,7 +193,7 @@ export default class User {
             res.send({
                 errno: 2,
                 data: row,
-                message: "查询为空",
+                message: "不存在这个用户",
             })
         }
     }

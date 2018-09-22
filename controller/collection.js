@@ -7,34 +7,52 @@ class Collection {
 
     }
 
+    // 返回指定用户的收藏列表
     async getCollection(req, res, next) {
         let userId = req.body.id
 
-        let sql = "SELECT article_id,title,dateline,banner_img,author,fuck_date,tags,agree"
-            + " FROM hos_collection ,hos_article,hos_user "
-            + "  WHERE hos_article.id IN ("
-            + "  SELECT article_id FROM hos_collection WHERE user_id=? GROUP BY article_id"
-            + " ) AND hos_collection.article_id=hos_article.id AND user_id=? AND hos_user.id=?;"
-        const row = await query(sql, [userId, userId, userId]).catch((err) => {
+        let sql = `
+                  SELECT C.article_id,
+                   A.title,
+                   A.dateline,
+                   A.banner_img,
+                   A.author,
+                   A.fuck_date,
+                   A.tags,
+                   A.agree
+            FROM hos_collection C
+                   RIGHT JOIN hos_article A on A.id = C.article_id
+            where user_id = ?;
+        `
+
+        const row = await query(sql, [userId]).catch((err) => {
             console.log(err)
             return err.message
         })
         res.send(returnRes(row))
     }
 
-    //  返回用户的收藏
+    //  返回用户的收藏 (不是 post,普通函数)
     async getUserCollection(userId, page) {
         //每页显示100条数据
         let num = 100;
         // 获取limit的第一个参数的值 offset ，(传入的页数-1) * 每页的数据 得到limit第一个参数的值
         let offset = (page - 1) * num;
 
-        let sql = "SELECT article_id,title,dateline,banner_img,author,fuck_date,tags,agree"
-            + " FROM hos_collection ,hos_article,hos_user "
-            + "  WHERE hos_article.id IN ("
-            + "  SELECT article_id FROM hos_collection WHERE user_id=? GROUP BY article_id"
-            + " ) AND hos_collection.article_id=hos_article.id AND user_id=? AND hos_user.id=?  limit "
-            + offset + ","
+        let sql = `
+                  SELECT C.article_id,
+                   A.title,
+                   A.dateline,
+                   A.banner_img,
+                   A.author,
+                   A.fuck_date,
+                   A.tags,
+                   A.agree
+            FROM hos_collection C
+                   RIGHT JOIN hos_article A on A.id = C.article_id
+            where user_id = ?
+        `
+            + "limit " + offset + ","
             + num;
 
         const row = await query(sql, [userId, userId, userId]).catch((err) => {
@@ -63,21 +81,20 @@ class Collection {
             return err.message
         })
 
-        // 返回经过修改后的收藏列表
-        let sqlCollectList = "SELECT article_id,title,dateline,banner_img,author,fuck_date,tags,agree"
-            + " FROM hos_collection ,hos_article,hos_user "
-            + "  WHERE hos_article.id IN ("
-            + "  SELECT article_id FROM hos_collection WHERE user_id=? GROUP BY article_id"
-            + " ) AND hos_collection.article_id=hos_article.id AND user_id=? AND hos_user.id=?;"
-
-        // 如果文章被删除就会多一条全是 null 的记录
-        // let sqlCollectList = `
-        // SELECT C.article_id,A.title,A.dateline,A.banner_img,A.author,A.fuck_date,A.tags,A.agree
-        // FROM hos_collection C
-        // LEFT JOIN hos_article A on A.id=C.article_id
-        // where user_id=?
-        // `
-        const row2 = await query(sqlCollectList, [userId, userId, userId]).catch((err) => {
+        let sqlCollectList = `
+                  SELECT C.article_id,
+                   A.title,
+                   A.dateline,
+                   A.banner_img,
+                   A.author,
+                   A.fuck_date,
+                   A.tags,
+                   A.agree
+            FROM hos_collection C
+                   RIGHT JOIN hos_article A on A.id = C.article_id
+            where user_id = ?;
+        `
+        const row2 = await query(sqlCollectList, [userId]).catch((err) => {
             console.log(err)
             return err.message
         })
@@ -86,7 +103,7 @@ class Collection {
                 errno: 0,
                 res: row,
                 data: row2,
-                message: "收藏成功"
+                message: collect === 1 ? "已收藏" : "取消收藏"
             })
         } else {
             res.send({

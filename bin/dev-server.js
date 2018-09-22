@@ -103,6 +103,7 @@ const io = require('socket.io')(server);
 
 
 io.on('connection', (socket) => {
+    console.log(socket.handshake.headers.origin + " 已连接")
 
     socket.join('room 2333', () => {
         let rooms = Object.keys(socket.rooms);
@@ -153,6 +154,8 @@ io.on('connection', (socket) => {
         }
         // 触发下线提醒
         socket.broadcast.emit('notice', notice)
+
+        console.log(socket.handshake.headers.origin + " 断开连接")
         // 断开客户端连接
         socket.disconnect(0)
     })

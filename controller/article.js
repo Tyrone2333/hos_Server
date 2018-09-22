@@ -179,14 +179,12 @@ class Article {
     // 评论发表
     async reply(req, res, next) {
 
-        // from_id, to_id, content, timestamp, article_id, from_nickname, to_nickname
+        // from_id, to_id, content, timestamp, article_id,
         let from_id = req.body.from_id
         let to_id = req.body.to_id
         let content = req.body.content
         let timestamp = Math.round(new Date().getTime() / 1000)
         let article_id = req.body.article_id
-        let from_nickname = req.body.from_nickname
-        let to_nickname = req.body.to_nickname
 
         // 验证
         let editError
@@ -196,8 +194,6 @@ class Article {
             editError = '字数太多或太少'
         } else if (!from_id) {
             editError = '没有回复主体'
-        } else if (from_id !== req.body.id) {
-            editError = '用户信息有误'
         }
         // END 验证
         if (editError) {

@@ -45,8 +45,8 @@ export function returnRes(row) {
         })
     } else {
         return ({
-            errno: 2,
-            data: row[0],
+            errno: 0,
+            data: [],
             message: "查询为空",
         })
     }

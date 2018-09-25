@@ -141,10 +141,20 @@ io.on('connection', (socket) => {
         let notice = {
             nickname: data.nickname,
             timeStamp: Math.round(new Date().getTime()),
-            type: "online"
+            type: "online",
+            userNum: 0,
         }
-        // 触发上线提醒
-        socket.broadcast.emit('notice', notice)
+        // 获取房间的在线人数
+        io.in('room 2333').clients( (error, clients) => {
+            if (error) throw error;
+            notice.userNum = clients.length
+
+            // 触发上线提醒
+            // socket.broadcast.emit('notice', notice) // 对除自己外所有人广播
+            io.emit('notice', notice)   // 对所有人广播
+        })
+        // io.clinets 是异步获取客户端的!!
+        // console.log("获取人数的外面先 log 出来!!")
     })
     socket.on('offline', data => {
         let notice = {
@@ -152,12 +162,18 @@ io.on('connection', (socket) => {
             timeStamp: Math.round(new Date().getTime()),
             type: "offline"
         }
-        // 触发下线提醒
-        socket.broadcast.emit('notice', notice)
-
-        console.log(socket.handshake.headers.origin + " 断开连接")
-        // 断开客户端连接
+        // 先,断开客户端连接
         socket.disconnect(0)
+        console.log(socket.handshake.headers.origin + " 断开连接")
+
+        // 后,获取房间的在线人数
+        io.in('room 2333').clients( (error, clients) => {
+            if (error) throw error;
+            notice.userNum = clients.length
+
+            // 触发下线提醒
+            socket.broadcast.emit('notice', notice)
+        })
     })
 
     socket.on("disconnect ", (reason) => {

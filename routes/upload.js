@@ -100,7 +100,7 @@ function outputFileInfo(req, res, next) {
         data: [
 
             // "//dushizz.top:" + config.dev.port + `/${savePath}/` + fileWithExtension
-            "//127.0.0.1:" + config.dev.port + `/${savePath}/` + fileWithExtension
+          `//${getIPAddress()}:` + config.dev.port + `/${savePath}/` + fileWithExtension
         ],
     }
     next()

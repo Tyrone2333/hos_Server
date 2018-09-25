@@ -8,7 +8,7 @@ const util = {}
 util.checkDirExist = (folderpath) => {
     const pathArr = folderpath.split('/')
     let _path = ''
-    for (let i = 0 ;i < pathArr.length; i++) {
+    for (let i = 0; i < pathArr.length; i++) {
         if (pathArr[i]) {
 
             _path += `/${pathArr[i]}`
@@ -21,12 +21,12 @@ util.checkDirExist = (folderpath) => {
     }
 }
 // let tempPath = "static/avatar/avatar"
-let tempPath = "static/"
+let tempPath = "test/"
 const pathArr = tempPath.split('/')
 console.log(pathArr)
 
 console.log(fs.existsSync(tempPath))
-if(!fs.existsSync(tempPath)) {
+if (!fs.existsSync(tempPath)) {
     console.log(
         fs.mkdirSync(tempPath)
     )

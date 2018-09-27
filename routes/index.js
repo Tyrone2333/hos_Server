@@ -3,6 +3,7 @@ let test = require("./test")
 let article = require("./article")
 let collection = require("./collection")
 let upload = require("./upload")
+let message = require("./message")
 
 let router = require('express').Router();
 
@@ -22,5 +23,9 @@ export default (app) => {
     app.use("/hos_api/article", article)
     app.use("/hos_api/collection", collection)
     app.use("/hos_api/upload", upload)
+
+    app.use("/hos_api/message", message)
+
+
 }
 

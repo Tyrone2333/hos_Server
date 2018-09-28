@@ -3,7 +3,25 @@
  * @param io
  */
 import clientMap from "./clientMap"
+
 const msgModel = require("./messageModel")
+const redis = require("../../helper/redis")
+
+//初始化连接人数
+redis.set('online_count', 3, null, function (err, ret) {
+    if (err) {
+        console.error(err);
+    }
+});
+
+redis.get("online_count", function (err, data) {
+    if (err) throw err;
+    if (data != null) {
+        console.log("online_count",data)
+    } else {
+        next();
+    }
+});
 
 function ioServer(io) {
     io.on('connection', (socket) => {
@@ -31,7 +49,7 @@ function ioServer(io) {
                     message: data.message,
                     message_type: data.message_type,
 
-                    timeStamp: Math.round(new Date().getTime()/ 1000),
+                    timeStamp: Math.round(new Date().getTime() / 1000),
                 }
                 // connection.sendUTF(JSON.stringify(resData))
             }
@@ -49,8 +67,8 @@ function ioServer(io) {
                 io.sockets.emit("message", resData)
             }
 
-            msgModel.add(resData,function (err) {
-                if(err){
+            msgModel.add(resData, function (err) {
+                if (err) {
                     console.error(err);
                 }
             });
@@ -100,16 +118,16 @@ function ioServer(io) {
         })
 
         //重连事件
-        socket.on('reconnect', function() {
-            console.log(socket.id +  " 重新连接到 ws 服务器");
+        socket.on('reconnect', function () {
+            console.log(socket.id + " 重新连接到 ws 服务器");
         })
         // 断开连接
         socket.on("disconnect", (rea) => {
-            console.log(socket.id +  " 断开连接,原因: " + rea)
+            console.log(socket.id + " 断开连接,原因: " + rea)
         })
     })
 
 }
 
-//模块导出
+// socket.io 模块导出
 exports.ioServer = ioServer;

@@ -6,7 +6,7 @@ mongoose.connect(DB_URL);
  * 连接成功
  */
 mongoose.connection.on('connected', function () {
-    console.log('Mongoose 已连接到:  ' + DB_URL);
+    console.log('Mongoose 已连接到数据库:  ' + DB_URL);
 });
 
 /**

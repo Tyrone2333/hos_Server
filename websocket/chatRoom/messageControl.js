@@ -41,7 +41,6 @@ export default new class Message {
             return res.send({errno: 0, message: "获取成功", data: data});
         })
 
-
     }
 
 }

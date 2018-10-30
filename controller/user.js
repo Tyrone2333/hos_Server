@@ -27,8 +27,10 @@ export default class User {
         if (result !== undefined && result.affectedRows === 1) {
             res.send({
                 errno: 0,
-                id: result.insertId,
-                message: '注册成功',
+                data:{
+                    id: result.insertId,
+                    message: '注册成功',
+                },
             })
         } else {
             res.send({
@@ -64,9 +66,11 @@ export default class User {
 
                 res.send({
                     errno: 0,
-                    token,
-                    userinfo: user,
-                    message: "登录成功"
+                    data:{
+                        token,
+                        userinfo: user,
+                        message: "登录成功"
+                    }
                 })
             } else {
                 res.send({
@@ -78,8 +82,10 @@ export default class User {
         } else {
             res.send({
                 errno: -1,
-                row: row,
-                message: "用户不存在"
+                data:{
+                    row: row,
+                },
+                message: "用户不存在",
             })
         }
     }
@@ -227,8 +233,10 @@ export default class User {
 
                 res.send({
                     errno: 0,
-                    userinfo: user,
-                    message: "修改成功"
+                    data:{
+                        userinfo: user,
+                        message: "修改成功"
+                    }
                 })
             }
         } else {
@@ -268,8 +276,10 @@ export default class User {
                 if (row.affectedRows > 0) {
                     res.send({
                         errno: 0,
-                        row,
-                        message: "密码修改成功"
+                        data:{
+                            row,
+                            message: "密码修改成功"
+                        }
                     })
                 } else {
                     res.send({

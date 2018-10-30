@@ -46,8 +46,10 @@ class Article {
         if (row.length > 0) {
             res.send({
                 errno: 0,
-                data: row,
-                reply
+                data: {
+                    data:row,
+                    reply
+                }
             })
         } else {
             res.send({
@@ -101,15 +103,19 @@ class Article {
         if (row.affectedRows > 0) {
             res.send({
                 errno: 0,
-                data: row,
-                article_id: row.insertId,
-                message: "发布成功"
+                data:{
+                    row,
+                    article_id: row.insertId,
+                    message: "发布成功"
+                }
             })
         } else {
             res.send({
                 errno: -1,
-                data: row,
-                message: "发布失败",
+                data:{
+                    row,
+                    message: "发布失败",
+                }
             })
         }
     }

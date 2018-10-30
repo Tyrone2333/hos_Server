@@ -5,23 +5,24 @@
 import clientMap from "./clientMap"
 
 const msgModel = require("./messageModel")
-const redis = require("../../helper/redis")
 
-//初始化连接人数
-redis.set('online_count', 3, null, function (err, ret) {
-    if (err) {
-        console.error(err);
-    }
-});
-
-redis.get("online_count", function (err, data) {
-    if (err) throw err;
-    if (data != null) {
-        console.log("online_count",data)
-    } else {
-        next();
-    }
-});
+// const redis = require("../../helper/redis")
+//
+// //初始化连接人数
+// redis.set('online_count', 3, null, function (err, ret) {
+//     if (err) {
+//         console.error(err);
+//     }
+// });
+//
+// redis.get("online_count", function (err, data) {
+//     if (err) throw err;
+//     if (data != null) {
+//         console.log("online_count",data)
+//     } else {
+//         next();
+//     }
+// });
 
 function ioServer(io) {
     io.on('connection', (socket) => {

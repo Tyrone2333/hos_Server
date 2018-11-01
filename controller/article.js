@@ -1,6 +1,7 @@
 /**
  * 可参考 https://cnodejs.org/api/v1/topic/5433d5e4e737cbe96dcef312 的api设计
  */
+import {returnRes} from "../common/func";
 
 class Article {
     constructor() {
@@ -44,19 +45,12 @@ class Article {
         })
 
         if (row.length > 0) {
-            res.send({
-                errno: 0,
-                data: {
-                    data:row,
-                    reply
-                }
-            })
+            res.send(rtFormat("ok",{
+                data:row,
+                reply
+            },200))
         } else {
-            res.send({
-                errno: 2,
-                data: row[0],
-                message: "查询为空",
-            })
+            res.send(rtFormat("查询为空"))
         }
 
     }
@@ -87,10 +81,9 @@ class Article {
         }
         // END 验证
         if (editError) {
-            res.send({
-                errno: 3,
-                message: editError,
-            })
+
+            res.send(rtFormat(editError))
+
         }
         let sql = "insert into hos_article(title, author,author_id, description, content,md,banner_img,dateline,fuck_date,tags)"
             + " values(?,?,?,?,?,?,?,?,?,?)"
@@ -101,22 +94,14 @@ class Article {
         })
 
         if (row.affectedRows > 0) {
-            res.send({
-                errno: 0,
-                data:{
-                    row,
-                    article_id: row.insertId,
-                    message: "发布成功"
-                }
-            })
+            res.send(rtFormat("发布成功",{
+                row,
+                article_id: row.insertId,
+                message: "发布成功"
+            },200))
+
         } else {
-            res.send({
-                errno: -1,
-                data:{
-                    row,
-                    message: "发布失败",
-                }
-            })
+            res.send(rtFormat("发布失败"))
         }
     }
 
@@ -203,10 +188,8 @@ class Article {
         }
         // END 验证
         if (editError) {
-            res.send({
-                errno: 3,
-                message: editError,
-            })
+            res.send(rtFormat(editError))
+
             return
         }
 
@@ -219,17 +202,11 @@ class Article {
         })
 
         if (row.affectedRows > 0) {
-            res.send({
-                errno: 0,
-                row_insertId: row.insertId,
-                message: "评论成功",
-            })
+            res.send(rtFormat("评论成功","评论成功",200))
+
         } else {
-            res.send({
-                errno: -1,
-                data: row,
-                message: "评论失败",
-            })
+            res.send(rtFormat("评论失败"))
+
         }
     }
 

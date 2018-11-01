@@ -99,19 +99,14 @@ class Collection {
             return err.message
         })
         if (row.affectedRows > 0) {
-            res.send({
-                errno: 0,
+            res.send(rtFormat(collect === 1 ? "已收藏" : "取消收藏", {
                 res: row,
                 data: row2,
                 message: collect === 1 ? "已收藏" : "取消收藏"
-            })
+            }, 200))
+
         } else {
-            res.send({
-                errno: -1,
-                res: row[0],
-                data: row2,
-                message: "收藏失败"
-            })
+            res.send(rtFormat("收藏失败"))
         }
     }
 

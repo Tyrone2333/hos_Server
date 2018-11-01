@@ -2,6 +2,7 @@ import Auth from "../middlewares/auth"
 import Article from "./article"
 import Collection from "./collection"
 
+let resHelper = require("../helper/resHelper")
 export default class User {
     constructor() {
 
@@ -25,19 +26,13 @@ export default class User {
             return err.sqlMessage
         })
         if (result !== undefined && result.affectedRows === 1) {
-            res.send({
-                errno: 0,
-                data:{
-                    id: result.insertId,
-                    message: '注册成功',
-                },
-            })
-        } else {
-            res.send({
-                errno: -1,
-                message: result,
-            })
+            res.send(rtFormat("注册成功", {
+                id: result.insertId,
+                message: '注册成功',
+            }, 200))
 
+        } else {
+            res.send(rtFormat(result))
         }
 
     }
@@ -64,29 +59,15 @@ export default class User {
 
                 let token = await Auth.getToken(username)
 
-                res.send({
-                    errno: 0,
-                    data:{
-                        token,
-                        userinfo: user,
-                        message: "登录成功"
-                    }
-                })
+                res.send(rtFormat("登录成功", {token, userinfo: user,}, 200))
+
             } else {
-                res.send({
-                    errno: 1,
-                    message: "密码错误"
-                })
+                res.send(rtFormat("密码错误"))
             }
 
         } else {
-            res.send({
-                errno: -1,
-                data:{
-                    row: row,
-                },
-                message: "用户不存在",
-            })
+            res.send(rtFormat("用户不存在", row, -1))
+
         }
     }
 
@@ -105,12 +86,7 @@ export default class User {
         });
 
         if (error !== undefined) {
-            res.send({
-                errno: 401,
-                decode,
-                error,
-                message: "验证过期，请重新登录"
-            })
+            res.send(rtFormat("验证过期，请重新登录", {decode, error}, 401,))
         } else {
             // token验证成功了
             if (decode.username && decode.userId) {
@@ -131,18 +107,10 @@ export default class User {
 
                     let token = await Auth.getToken(username)
 
-                    res.send({
-                        errno: 0,
-                        token,
-                        userinfo: user,
-                        message: "token刷新,登录成功"
-                    })
+                    res.send(rtFormat("token刷新,登录成功", {token, userinfo: user,}, 200))
+
                 } else {
-                    res.send({
-                        errno: -1,
-                        row: row,
-                        message: "用户不存在"
-                    })
+                    res.send(rtFormat("用户不存在", row, -1))
                 }
             }
 
@@ -183,24 +151,17 @@ export default class User {
             delete user.salt
             delete user.pwd
 
-            res.send({
-                errno: 0,
-                data: {
-                    userInfo: user,
-                    userArticle,
-                    userCollection,
-                    // 现在只有评论,以后可能有其他拓展
-                    userReply: {
-                        comment: userComment,
-                    },
-                }
-            })
+            res.send(rtFormat("ok", {
+                userInfo: user,
+                userArticle,
+                userCollection,
+                // 现在只有评论,以后可能有其他拓展
+                userReply: {
+                    comment: userComment,
+                },
+            }, 200))
         } else {
-            res.send({
-                errno: 2,
-                data: row,
-                message: "不存在这个用户",
-            })
+            res.send(rtFormat("不存在这个用户"))
         }
     }
 
@@ -231,19 +192,10 @@ export default class User {
                 delete user.salt
                 delete user.pwd
 
-                res.send({
-                    errno: 0,
-                    data:{
-                        userinfo: user,
-                        message: "修改成功"
-                    }
-                })
+                res.send(rtFormat("修改成功", {message: "修改成功", userinfo: user,}, 200))
             }
         } else {
-            res.send({
-                errno: 1,
-                message: "修改出错了"
-            })
+            res.send(rtFormat("修改出错了"))
         }
 
     }
@@ -274,32 +226,18 @@ export default class User {
                 })
 
                 if (row.affectedRows > 0) {
-                    res.send({
-                        errno: 0,
-                        data:{
-                            row,
-                            message: "密码修改成功"
-                        }
-                    })
+                    res.send(rtFormat("修改成功", {row,}, 200))
+
                 } else {
-                    res.send({
-                        errno: 1,
-                        message: "密码修改失败"
-                    })
+                    res.send(rtFormat("密码修改失败",))
                 }
 
             } else {
                 // 旧密码验证失败
-                res.send({
-                    errno: 1,
-                    message: "旧密码错误"
-                })
+                res.send(rtFormat("旧密码错误",))
             }
         } else {
-            res.send({
-                errno: 1,
-                message: "修改出错了"
-            })
+            res.send(rtFormat("修改出错了",))
         }
 
     }

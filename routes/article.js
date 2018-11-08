@@ -12,5 +12,8 @@ router.get('/:id', Article.getArticleById)
 // 发布文章
 router.post('/public', Auth.checkUser, Article.publicArticle)
 router.post('/reply', Auth.checkUser, Article.reply)
+// 不用 get,会和 getArticleById 冲突
+router.post('/setZan', Article.setZan)
+
 
 module.exports = router;

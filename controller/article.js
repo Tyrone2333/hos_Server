@@ -21,7 +21,7 @@ class Article {
         let offset = (page - 1) * num
 
 
-        let sql = "select  id,title,description,dateline,banner_img,author,fuck_date,tags,agree,disagree from hos_article order by dateline desc limit "
+        let sql = "select  id,title,description,dateline,banner_img,author,fuck_date,tags from hos_article order by dateline desc limit "
             // let sql = "select * from hos_article order by dateline desc limit "
             + offset + ","
             + num
@@ -35,7 +35,21 @@ class Article {
     async getArticleById(req, res, next) {
 
         let id = req.params.id
-        let sql = "select * from hos_article WHERE id= " + id
+        let userId = req.query.userId || 0
+        // # 查找当前文章的内容,包含自己是否已赞过,需传入文章 id 和 用户id
+        // let sql = "select * from hos_article WHERE id= " + id
+        let sql = `
+                    SELECT
+                      count(1) AS 'agree',
+                      CASE WHEN A.id = Z.type_id
+                        THEN TRUE
+                      ELSE FALSE
+                      END AS 'is_zan',
+                      A.*
+                    FROM hos_zan Z
+                      LEFT JOIN hos_article A ON Z.type_id = A.id AND Z.user_id = ${userId}
+                    WHERE Z.type_id = A.id AND Z.type_id = ${id};
+                    `
 
         const row = await query(sql).catch((err) => {
             console.log(err)
@@ -43,12 +57,11 @@ class Article {
         const reply = await this.getCommentByArticle(id).catch(err => {
             console.error(err)
         })
-
         if (row.length > 0) {
-            res.send(rtFormat("ok",{
-                data:row,
+            res.send(rtFormat("ok", {
+                data: row,
                 reply
-            },200))
+            }, 200))
         } else {
             res.send(rtFormat("查询为空"))
         }
@@ -94,11 +107,11 @@ class Article {
         })
 
         if (row.affectedRows > 0) {
-            res.send(rtFormat("发布成功",{
+            res.send(rtFormat("发布成功", {
                 row,
                 article_id: row.insertId,
                 message: "发布成功"
-            },200))
+            }, 200))
 
         } else {
             res.send(rtFormat("发布失败"))
@@ -155,7 +168,7 @@ class Article {
         let offset = (page - 1) * num
 
 
-        let sql = " select  id AS 'article_id',title,description,dateline,banner_img,author,fuck_date,tags,agree,disagree from hos_article " +
+        let sql = " select  id AS 'article_id',title,description,dateline,banner_img,author,fuck_date,tags from hos_article " +
             "WHERE author_id=? order by dateline desc limit "
             + offset + ","
             + num
@@ -202,7 +215,7 @@ class Article {
         })
 
         if (row.affectedRows > 0) {
-            res.send(rtFormat("评论成功","评论成功",200))
+            res.send(rtFormat("评论成功", "评论成功", 200))
 
         } else {
             res.send(rtFormat("评论失败"))
@@ -210,24 +223,54 @@ class Article {
         }
     }
 
-
-    // 投票(点赞),后续可能有对评论,文章,主页的点赞
-    // 应该单独拉出来用缓存来做,臣妾现在还做不到
-    // 还应考虑网红发文,突然点赞人数暴涨
-    //
-
     // id	主键
     // type_id	对应的作品或评论的id
     // type	点赞类型  1作品点赞  2 评论点赞 3....
     // user_id	用户id
-    // status	点赞状态  0--取消赞   1--有效赞
+    // dateline  创建时间
 
     // 这样的表结构也并不好,有些大v的文章可能会得到几十万的点赞，这样就会产生几十万条数据,而普通人
     // 可能就一两个赞
-    async vote(req, res, next) {
+    async setZan(req, res, next) {
+        let {typeId, userId, action} = req.body
+        let dateline = Math.round(new Date().getTime() / 1000)
+        let sql
+        // 点赞的行为
+        if (action === "zan") {
+            sql = `INSERT INTO hos_zan(user_id, type_id, type, dateline) VALUE (${userId}, ${typeId}, 1, ${dateline});`
+            let checkSql = `SELECT id
+                            FROM hos_zan
+                            WHERE user_id = ${userId} AND type_id = ${typeId};`
+            let row = await query(checkSql).catch((err) => {
+                console.log(err)
+                return err.message
+            })
+            if (row.length > 0) {
+                res.send(rtFormat("点赞已存在,不能重复插入"))
+                return
+            }
+            // 取消赞
+        } else if (action === "cancelZan") {
+            sql = `
+                    DELETE FROM hos_zan
+                    WHERE user_id = ${userId} AND type_id = ${typeId};
+                    `
+        } else {
+            res.send(rtFormat("必须传入action"))
+            return
+        }
 
+        let row = await query(sql).catch((err) => {
+            console.log(err)
+            return err.message
+        })
+        if (row.affectedRows > 0) {
+            res.send(rtFormat("成功", "成功", 200))
+        } else {
+            res.send(rtFormat("点赞失败"))
+
+        }
     }
-
 }
 
 export default new Article()

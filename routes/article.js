@@ -13,7 +13,7 @@ router.get('/:id', Article.getArticleById)
 router.post('/public', Auth.checkUser, Article.publicArticle)
 router.post('/reply', Auth.checkUser, Article.reply)
 // 不用 get,会和 getArticleById 冲突
-router.post('/setZan', Article.setZan)
+router.post('/setZan', Auth.checkUser, Article.setZan)
 
 
 module.exports = router;

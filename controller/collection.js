@@ -12,20 +12,20 @@ class Collection {
         let userId = req.body.id
 
         let sql = `
-                  SELECT C.article_id,
-                   A.title,
-                   A.dateline,
-                   A.banner_img,
-                   A.author,
-                   A.fuck_date,
-                   A.tags,
-                   A.agree
-            FROM hos_collection C
-                   RIGHT JOIN hos_article A on A.id = C.article_id
-            where user_id = ?;
+              SELECT DISTINCT C.article_id,
+                  A.title,
+                  A.dateline,
+                  A.banner_img,
+                  A.author,
+                  A.fuck_date,
+                  A.tags
+                  ,(SELECT count(1) FROM hos_zan Z WHERE A.id=Z.type_id) AS 'agree'
+                FROM hos_collection C
+                  RIGHT JOIN hos_article A on A.id = C.article_id
+                where C.user_id = ${userId} 
         `
 
-        const row = await query(sql, [userId]).catch((err) => {
+        const row = await query(sql ).catch((err) => {
             console.log(err)
             return err.message
         })
@@ -40,22 +40,22 @@ class Collection {
         let offset = (page - 1) * num;
 
         let sql = `
-                  SELECT C.article_id,
-                   A.title,
-                   A.dateline,
-                   A.banner_img,
-                   A.author,
-                   A.fuck_date,
-                   A.tags,
-                   A.agree
-            FROM hos_collection C
-                   RIGHT JOIN hos_article A on A.id = C.article_id
-            where user_id = ?
+               SELECT DISTINCT C.article_id,
+                  A.title,
+                  A.dateline,
+                  A.banner_img,
+                  A.author,
+                  A.fuck_date,
+                  A.tags
+                  ,(SELECT count(1) FROM hos_zan Z WHERE A.id=Z.type_id) AS 'agree'
+                FROM hos_collection C
+                  RIGHT JOIN hos_article A on A.id = C.article_id
+                where C.user_id = ${userId} 
+                 limit ${offset}, ${num};
         `
-            + "limit " + offset + ","
-            + num;
 
-        const row = await query(sql, [userId, userId, userId]).catch((err) => {
+console.log(sql)
+        const row = await query(sql).catch((err) => {
             console.log(err)
         })
 
@@ -82,19 +82,19 @@ class Collection {
         })
 
         let sqlCollectList = `
-                  SELECT C.article_id,
-                   A.title,
-                   A.dateline,
-                   A.banner_img,
-                   A.author,
-                   A.fuck_date,
-                   A.tags,
-                   A.agree
-            FROM hos_collection C
-                   RIGHT JOIN hos_article A on A.id = C.article_id
-            where user_id = ?;
+              SELECT DISTINCT C.article_id,
+                  A.title,
+                  A.dateline,
+                  A.banner_img,
+                  A.author,
+                  A.fuck_date,
+                  A.tags
+                  ,(SELECT count(1) FROM hos_zan Z WHERE A.id=Z.type_id) AS 'agree'
+                FROM hos_collection C
+                  RIGHT JOIN hos_article A on A.id = C.article_id
+                where C.user_id = ${userId} ;
         `
-        const row2 = await query(sqlCollectList, [userId]).catch((err) => {
+        const row2 = await query(sqlCollectList ).catch((err) => {
             console.log(err)
             return err.message
         })

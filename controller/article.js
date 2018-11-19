@@ -40,15 +40,15 @@ class Article {
         // let sql = "select * from hos_article WHERE id= " + id
         let sql = `
                     SELECT
-                      count(1) AS 'agree',
+                      (SELECT count(1) FROM hos_zan Z WHERE A.id=Z.type_id) AS 'agree',
                       CASE WHEN A.id = Z.type_id
                         THEN TRUE
                       ELSE FALSE
-                      END AS 'is_zan',
+                      END      AS 'is_zan',
                       A.*
-                    FROM hos_zan Z
-                      LEFT JOIN hos_article A ON Z.type_id = A.id AND Z.user_id = ${userId}
-                    WHERE Z.type_id = A.id AND Z.type_id = ${id};
+                    FROM hos_article A
+                      LEFT JOIN hos_zan Z ON Z.type_id = A.id AND Z.user_id = ${userId}
+                    WHERE A.id= ${id};
                     `
 
         const row = await query(sql).catch((err) => {
@@ -233,6 +233,8 @@ class Article {
     // 可能就一两个赞
     async setZan(req, res, next) {
         let {typeId, userId, action} = req.body
+
+        console.log(req.body)
         let dateline = Math.round(new Date().getTime() / 1000)
         let sql
         // 点赞的行为

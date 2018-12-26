@@ -1,20 +1,22 @@
 /**
  *  这里是存放 用户名 与其对应的 socket.id
  */
-export default new class  clientMap {
-    constructor(){
+export default new class clientMap {
+    constructor() {
         this.map = {
             // username : socket.id
         }
     }
 
-    getClientByUid(username){
+    getClientByUid(username) {
         return this.map[username]
     }
-     getClients(){
+
+    getClients() {
         return this.map
     }
-    addClient(username, id){
+
+    addClient(username, id) {
         this.map[username] = id
     }
 

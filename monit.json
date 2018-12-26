@@ -15,7 +15,11 @@
         "public/images",
         "static/images",
         "node_modules"
-      ]
+      ],
+      "env": {
+        "NODE_ENV": "production",
+        "AWESOME_SERVICE_API_TOKEN": "xxx"
+      }
     }
   ]
 }

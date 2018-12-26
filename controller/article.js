@@ -229,8 +229,7 @@ class Article {
     // user_id	用户id
     // dateline  创建时间
 
-    // 这样的表结构也并不好,有些大v的文章可能会得到几十万的点赞，这样就会产生几十万条数据,而普通人
-    // 可能就一两个赞
+    // 这样的表结构也并不好,有些大v的文章可能会得到几十万的点赞，这样就会产生几十万条数据,而普通人可能就一两个赞
     async setZan(req, res, next) {
         let {typeId, userId, action} = req.body
 

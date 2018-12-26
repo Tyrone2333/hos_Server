@@ -1,4 +1,3 @@
-
 /**
  *   TODO 这一块处理的很不好,把逻辑放在路由
  */
@@ -99,8 +98,9 @@ function outputFileInfo(req, res, next) {
         body: req.body,
         data: [
 
-            // "//dushizz.top:" + config.dev.port + `/${savePath}/` + fileWithExtension
-          `//${getIPAddress()}:` + config.dev.port + `/${savePath}/` + fileWithExtension
+            config.dev.curDomain + ":" + config.dev.port + `/${savePath}/` + fileWithExtension
+            // 在 GCP 上获取的是内网ip
+            // `//${getIPAddress()}:` + config.dev.port + `/${savePath}/` + fileWithExtension
         ],
     }
     next()

@@ -22,7 +22,7 @@ export default new class Message {
                 console.error(err);
                 return res.send({errno: 400, message: "系统错误"});
             }
-            return res.send({errno: 0, message: "获取成功", data: data});
+            return res.send({errno: 200, message: "获取成功", data: data});
         })
 
 
@@ -38,7 +38,9 @@ export default new class Message {
                 console.error(err);
                 return res.send({errno: 400, message: "系统错误"});
             }
-            return res.send({errno: 0, message: "获取成功", data: data});
+            res.send(rtFormat("获取成功", data, 200))
+
+            // return res.send({errno: 200, message: "获取成功", data: data});
         })
 
     }

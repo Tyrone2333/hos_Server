@@ -6,14 +6,16 @@ if (process.env.NODE_ENV === "production") {
         host: '***',
         user: '***',
         password: '***',
-        database: 'bdm289907541_db'
+        database: 'bdm289907541_db',
+        port: 3306, // 台湾 gcp 端口为33060
     })
 } else {
     pool = mysql.createPool({
         host: '127.0.0.1',
         user: 'root',
         password: '***',
-        database: 'bdm289907541_db'
+        database: 'bdm289907541_db',
+        port: 3306,
     })
 }
 

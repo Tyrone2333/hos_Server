@@ -2,25 +2,23 @@
 var path = require('path')
 
 module.exports = {
-  build: {
-
-  },
-  dev: {
-    env: {
-        // NODE_ENV: '"production"',
-        NODE_ENV: '"development"',
-        BASE_API: '"http://192.168.1.186:10010"',
-    },
-    port: 10010,
-    autoOpenBrowser: false,
-    assetsSubDirectory: 'static',
-    assetsPublicPath: '/',
-    proxyTable: {},
-    // CSS Sourcemaps off by default because relative paths are "buggy"
-    // with this option, according to the CSS-Loader README
-    // (https://github.com/webpack/css-loader#sourcemaps)
-    // In our experience, they generally work as expected,
-    // just be aware of this issue when enabling this option.
-    cssSourceMap: false
-  }
+    build: {},
+    dev: {
+        env: {
+            // NODE_ENV: '"production"',
+            NODE_ENV: '"development"',
+        },
+        curDomain: '//undefined.ga',
+        port: 10010,
+        autoOpenBrowser: false,
+        assetsSubDirectory: 'static',
+        assetsPublicPath: '/',
+        proxyTable: {},
+        // CSS Sourcemaps off by default because relative paths are "buggy"
+        // with this option, according to the CSS-Loader README
+        // (https://github.com/webpack/css-loader#sourcemaps)
+        // In our experience, they generally work as expected,
+        // just be aware of this issue when enabling this option.
+        cssSourceMap: false
+    }
 }

@@ -54,7 +54,6 @@ class Collection {
                  limit ${offset}, ${num};
         `
 
-console.log(sql)
         const row = await query(sql).catch((err) => {
             console.log(err)
         })

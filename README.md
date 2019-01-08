@@ -13,8 +13,11 @@
 # 安装依赖
 npm install
 
-# 打开测试服务器
-pm2 start  ./monit.json
+# 开发模式
+npm run dev
+
+# 生产模式
+npm run pm2
 
 # 查看log
 pm2 logs

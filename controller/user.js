@@ -17,7 +17,6 @@ export default class User {
             username,
             pwd: password,
             nickname,
-            salt,
             register_time: Math.round(new Date().getTime() / 1000)
         }
         let sql = "insert into hos_user set ?"
@@ -47,14 +46,14 @@ export default class User {
         })
 
         if (row.length > 0) {
-            let expectPwd = getSha1(username + pwd + row[0].salt)
+            let salt = getSha1("fucksalt" + username)
+            let expectPwd = getSha1(username + pwd + salt)
             // 登录成功
             if (row[0].username === username && expectPwd === row[0].pwd) {
                 let user = {}
                 for (let key in row[0]) {
                     user[key] = row[0][key]
                 }
-                delete user.salt
                 delete user.pwd
 
                 let token = await Auth.getToken(username)
@@ -102,7 +101,6 @@ export default class User {
                     for (let key in row[0]) {
                         user[key] = row[0][key]
                     }
-                    delete user.salt
                     delete user.pwd
 
                     let token = await Auth.getToken(username)
@@ -148,7 +146,6 @@ export default class User {
             for (let key in row[0]) {
                 user[key] = row[0][key]
             }
-            delete user.salt
             delete user.pwd
 
             res.send(rtFormat("ok", {
@@ -189,7 +186,6 @@ export default class User {
                 for (let key in row[0]) {
                     user[key] = row[0][key]
                 }
-                delete user.salt
                 delete user.pwd
 
                 res.send(rtFormat("修改成功", {message: "修改成功", userinfo: user,}, 200))
@@ -212,7 +208,7 @@ export default class User {
         })
 
         if (row.length > 0) {
-            let salt = row[0].salt
+            let salt = getSha1("fucksalt" + username)
             let expectPwd = getSha1(username + oldPwd + salt)
             // 旧密码验证成功
             if (row[0].username === username && expectPwd === row[0].pwd) {

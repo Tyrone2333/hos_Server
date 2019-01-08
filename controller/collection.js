@@ -69,9 +69,10 @@ class Collection {
         let articleId = req.body.articleId
         let collect = req.body.collect  // 1 是执行收藏,0 是取消收藏
 
+        // TODO 重复插入数据的可能？？ 需处理
         let sql
         if (collect === 1) {
-            sql = "insert into hos_collection(user_id, article_id) values (?,?);";
+            sql = `insert into hos_collection(user_id, article_id) values (?,?);`;
         } else {
             sql = "DELETE FROM hos_collection WHERE user_id=? AND article_id=?;";
         }
@@ -93,11 +94,12 @@ class Collection {
                   RIGHT JOIN hos_article A on A.id = C.article_id
                 where C.user_id = ${userId} ;
         `
-        const row2 = await query(sqlCollectList ).catch((err) => {
-            console.log(err)
-            return err.message
-        })
+
         if (row.affectedRows > 0) {
+            const row2 = await query(sqlCollectList ).catch((err) => {
+                console.log(err)
+                return err.message
+            })
             res.send(rtFormat(collect === 1 ? "已收藏" : "取消收藏", {
                 res: row,
                 data: row2,

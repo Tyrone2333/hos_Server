@@ -13,10 +13,11 @@ yarn-error.log
 *.njsproj
 *.sln
 public/images
-static/images/avatar/*.*
-static/images/*.jpg
-static/images/*.jpeg
-static/images/*.png
-static/images/*.gif
+# 由于经常换域名和服务器,图片经常404,所以把这些静态文件都加到 git
+# static/images/avatar/*.*
+# static/images/*.jpg
+# static/images/*.jpeg
+# static/images/*.png
+# static/images/*.gif
 
 common/db.js

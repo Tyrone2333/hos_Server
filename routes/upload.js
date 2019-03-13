@@ -91,14 +91,17 @@ function outputFileInfo(req, res, next) {
     // req.file 是文件的信息
     // req.body 将具有文本域数据，如果存在的话
     let imgFile = req.files[0]
+    let domain = "//" + getIPAddress()
     console.log("接收文件并保存:", `${savePath}/` + fileWithExtension)
+    if (process.env.NODE_ENV === "production") {
+        domain = config.dev.curDomain
+    }
     req.fileInfo = {
         file: imgFile,
         owner: owner,
         body: req.body,
         data: [
-
-            config.dev.curDomain + ":" + config.dev.port + `/${savePath}/` + fileWithExtension
+            domain + ":" + config.dev.port + `/${savePath}/` + fileWithExtension
             // 在 GCP 上获取的是内网ip
             // `//${getIPAddress()}:` + config.dev.port + `/${savePath}/` + fileWithExtension
         ],

@@ -5,9 +5,9 @@ const WXBizDataCrypt = require('../helper/WXBizDataCrypt')
 const path = require('path')
 const fs = require('fs')
 
-let express = require('express');
-let router = express.Router();
-let rf = require("fs");
+let express = require('express')
+let router = express.Router()
+let rf = require("fs")
 let multer = require('multer')
 
 let config = require("../config")
@@ -21,11 +21,11 @@ let storage = multer.diskStorage({
 
         let extension = file.originalname.match(/\.(\w+)$/)[1]
         let author = req.body.author
-        let rename = getSha1(author + file.originalname) + "." + extension;
+        let rename = getSha1(author + file.originalname) + "." + extension
 
         fileWithExtension = rename
         cb(null, rename)
-    }
+    },
 })
 
 let upload = multer({storage: storage})
@@ -35,27 +35,28 @@ router.get('/', async (req, res, next) => {
         log("先then一下")
         return data
     })
-
-    res.status(200)
-    res.send({
-        status: 200,
-        // watch:"in watch???",
-        data
-    })
+    res.error("不会用中间件的后果!!")
+    // res.status(200)
+    // res.send({
+    //     errcode: 0,
+    //     // watch:"in watch???",
+    //     data,
+    // })
     log("hos_api test ")
-});
+})
 
 router.post('/', async (req, res, next) => {
     let data = await read()
     log(data)
     res.send({
         status: 200,
-        data
+        data,
     })
     log(3)
-});
+})
 
 import utils from "../helper/utils"
+
 router.get('/checkDirExist', async (req, res, next) => {
     utils.checkDirExist("/static/avatar")
     res.send({
@@ -76,9 +77,9 @@ router.post('/upload', upload.any(), function (req, res, next) {
         file: imgFile,
         author: req.body.author,
         data: [
-            "//127.0.0.1:" + config.dev.port + "/static/images/" + fileWithExtension
+            "//127.0.0.1:" + config.dev.port + "/static/images/" + fileWithExtension,
         ],
-        message: "已保存文件"
+        message: "已保存文件",
     })
 })
 
@@ -91,7 +92,7 @@ async function read() {
                 // log(data)
                 resolve(data)
             }
-        });
+        })
     }).catch(err => {
         log(err)
     })
@@ -102,7 +103,7 @@ router.get('/login', async (req, res, next) => {
     const {
         'x-wx-code': code,
         'x-wx-encrypted-data': encryptedData,
-        'x-wx-iv': iv
+        'x-wx-iv': iv,
     } = req.headers
     if ([code, encryptedData, iv].every(v => !v)) {
         console.error("ERR_HEADER_MISSED")
@@ -118,8 +119,8 @@ router.get('/login', async (req, res, next) => {
             appid: appid,
             secret: appsecret,
             js_code: code,
-            grant_type: 'authorization_code'
-        }
+            grant_type: 'authorization_code',
+        },
     }).then(res => {
         res = res.data
         if (res.errcode || !res.openid || !res.session_key) {
@@ -165,6 +166,6 @@ router.get('/login', async (req, res, next) => {
 })
 
 
-module.exports = router;
+module.exports = router
 // export default  router;
 

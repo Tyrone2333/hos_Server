@@ -16,7 +16,7 @@ class Article {
         let page = req.query.page > 0 ? req.query.page : 1 //设置当前页数，没有则设置为1
 
         //每页显示10条数据
-        let num = 10
+        let num = 20
         // 获取limit的第一个参数的值 offset ，(传入的页数-1) * 每页的数据 得到limit第一个参数的值
         let offset = (page - 1) * num
 

@@ -22,12 +22,12 @@ var styles = {
     'greenBG': ['\x1B[42m', '\x1B[49m'],
     'magentaBG': ['\x1B[45m', '\x1B[49m'],
     'redBG': ['\x1B[41m', '\x1B[49m'],
-    'yellowBG': ['\x1B[43m', '\x1B[49m']
+    'yellowBG': ['\x1B[43m', '\x1B[49m'],
 }
 
 export function log(info) {
     if (typeof info === "string") {
-        console.log('\x1B[35m%s', info,)
+        console.log('\x1B[35m%s', info)
 
     } else if (typeof info === "number") {
         console.log('\x1B[1m\x1B[32m%s', info)
@@ -38,7 +38,7 @@ export function log(info) {
 }
 
 // 返回参数的统一格式化
-export function rtFormat(message = "返回消息未设置", data = {}, errno = 500,) {
+export function rtFormat(message = "返回消息未设置", data = {}, errno = 500) {
 
     // 只传入一个,认为是传错误信息
     // if (message !== "返回消息未设置" && data.toString() === "{}"){
@@ -77,16 +77,16 @@ export function getSha1(str) {
 }
 
 export function getIPAddress() {
-    var interfaces = require('os').networkInterfaces();
+    var interfaces = require('os').networkInterfaces()
     for (var devName in interfaces) {
-        var iface = interfaces[devName];
+        var iface = interfaces[devName]
 
         for (var i = 0; i < iface.length; i++) {
-            var alias = iface[i];
+            var alias = iface[i]
             if (alias.family === 'IPv4' && alias.address !== '127.0.0.1' && !alias.internal)
-                return alias.address;
+                return alias.address
         }
     }
 
-    return '0.0.0.0';
+    return '0.0.0.0'
 }

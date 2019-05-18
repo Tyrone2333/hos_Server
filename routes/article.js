@@ -1,8 +1,8 @@
 import Auth from "../middlewares/auth"
 import Article from "../controller/article"
 
-let express = require('express');
-let router = express.Router();
+let express = require('express')
+let router = express.Router()
 let multer = require('multer')
 let config = require("../config")
 
@@ -16,4 +16,4 @@ router.post('/reply', Auth.checkUser, Article.reply)
 router.post('/setZan', Auth.checkUser, Article.setZan)
 
 
-module.exports = router;
+module.exports = router

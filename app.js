@@ -6,7 +6,7 @@ var logger = require('morgan')
 
 
 import router from "./routes/index"
-
+import responseHelp from "./middlewares/responseHelp"
 // 设置为全局数据库连接句柄
 import query from './common/db'
 
@@ -42,7 +42,7 @@ app.use(cookieParser())
 // 静态文件
 app.use("/static", express.static(path.join(__dirname, 'static')))
 
-
+app.use(responseHelp)
 router(app)
 // catch 404 and forward to error handler
 // app.use(function(req, res, next) {
@@ -73,7 +73,7 @@ app.use(function (err, req, res, next) {
         res.send({
             errno: 5,
             message: '500 服务器出错',
-            errdetial:err.message
+            errdetial: err.message,
         })
     } else {
         // respond with html page
